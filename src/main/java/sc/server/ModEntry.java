@@ -1,0 +1,60 @@
+package sc.server;
+
+import org.slf4j.Logger;
+
+import com.mojang.logging.LogUtils;
+
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import sc.server.api.registry.Registers;
+import sc.server.client.render.Renders;
+import sc.server.entity.npc.Customer;
+
+@Mod(ModEntry.MOD_ID)
+public class ModEntry {
+	public static final String MOD_ID = "sc";
+	public static final Logger LOGGER = LogUtils.getLogger();
+
+	public ModEntry(FMLJavaModLoadingContext context) {
+		Registers.register(context);
+
+		IEventBus modEventBus = context.getModEventBus();
+
+		modEventBus.addListener(this::commonSetup);
+
+		MinecraftForge.EVENT_BUS.register(this);
+
+		context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+		Customer.init();
+	}
+
+	private void commonSetup(final FMLCommonSetupEvent event) {
+		LOGGER.info("commonSetup");
+
+	}
+
+	@SubscribeEvent
+	public void onServerStarting(ServerStartingEvent event) {
+		LOGGER.info("onServerStarting");
+	}
+
+	@Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+	public static class ClientModEvents {
+		@SubscribeEvent
+		public static void onClientSetup(FMLClientSetupEvent event) {
+			LOGGER.info("onClientSetup");
+			event.enqueueWork(() -> {
+				Renders.init();
+			});
+		}
+	}
+}
