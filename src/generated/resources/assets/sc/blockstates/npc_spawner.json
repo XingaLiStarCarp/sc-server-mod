@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "sc:block/npc_spawner"
+    }
+  }
+}

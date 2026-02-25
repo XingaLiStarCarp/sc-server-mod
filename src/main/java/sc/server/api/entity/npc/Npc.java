@@ -58,7 +58,7 @@ public class Npc extends Mob {
 	 */
 	public static final <T extends Npc> RegistryObject<EntityType<Npc>> newType(Class<T> clazz, Gender gender, String typeName, MobCategory category, List<Entry> attributes) {
 		ModEntry.LOGGER.info("Starting to create new npc type " + typeName);
-		RegistryObject<EntityType<Npc>> type = Registers.ENTITIES.register(typeName,
+		RegistryObject<EntityType<Npc>> type = Registers.ENTITIES_REG.register(typeName,
 				() -> EntityType.Builder.of((EntityType<Npc> entityType, Level level) -> {
 					try {
 						Constructor<T> constructor = clazz.getDeclaredConstructor(EntityType.class, Gender.class, String.class, ResourceLocation.class, Level.class);
@@ -299,16 +299,37 @@ public class Npc extends Mob {
 		}
 	}
 
-	private void handleEntityInteract(Player player, Npc target, ItemStack items) {
-		for (InteractionHandler op : interactionOps) {
-			op.execute(Interaction.USE_ITEM, player, target, items);
+	/**
+	 * 处理玩家与NPC的右键交互事件。<br>
+	 * 由于玩家左右手都能交互，因此每次交互PlayerInteractEvent.EntityInteract都会触发两次，分别代表左手和右手。<br>
+	 * 此外，当玩家一直按住右键时，该事件会连续地触发。<br>
+	 * 
+	 * @param player
+	 * @param target
+	 * @param hand
+	 * @param items
+	 */
+	private void handleEntityInteract(Player player, Npc target, InteractionHand hand, ItemStack items) {
+		if (player.getUsedItemHand() == hand) {// 只处理交互的那只手，否则左手右手将分别将触发两次。
+			switch (hand) {
+			case MAIN_HAND:
+				for (InteractionHandler op : interactionOps) {
+					op.execute(Interaction.USE_ITEM_MAINHAND, player, target, items);
+				}
+				break;
+			case OFF_HAND:
+				for (InteractionHandler op : interactionOps) {
+					op.execute(Interaction.USE_ITEM_OFFHAND, player, target, items);
+				}
+				break;
+			}
 		}
 	}
 
 	@SubscribeEvent
 	public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
 		if (event.getTarget() instanceof Npc npc) {
-			npc.handleEntityInteract(event.getEntity(), npc, event.getItemStack());
+			npc.handleEntityInteract(event.getEntity(), npc, event.getHand(), event.getItemStack());
 		}
 	}
 }

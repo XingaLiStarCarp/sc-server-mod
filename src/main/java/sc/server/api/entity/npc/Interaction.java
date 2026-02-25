@@ -13,7 +13,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 public enum Interaction {
-	ATTACK, USE_ITEM;
+	ATTACK,
+	USE_ITEM_MAINHAND,
+	USE_ITEM_OFFHAND;
 
 	@FunctionalInterface
 	public static interface InteractOperation {
@@ -162,7 +164,7 @@ public enum Interaction {
 
 	public static InteractOperation receiveItemFromPlayerMainHand(Item type, int count, Interaction... actions) {
 		return (action, player, npc, items) -> {
-			if ((actions.length == 0 && action == Interaction.USE_ITEM) || List.of(actions).contains(action)) {
+			if ((actions.length == 0 && action == Interaction.USE_ITEM_MAINHAND) || List.of(actions).contains(action)) {
 				if (items.getItem() == type) {
 					int currentCount = items.getCount();
 					if (currentCount < count) {
@@ -209,7 +211,7 @@ public enum Interaction {
 
 	public static InteractOperation receiveItemFromPlayerInventory(Item type, int count, Interaction... actions) {
 		return (action, player, npc, items) -> {
-			if ((actions.length == 0 && action == Interaction.USE_ITEM) || List.of(actions).contains(action)) {
+			if ((actions.length == 0 && action == Interaction.USE_ITEM_MAINHAND) || List.of(actions).contains(action)) {
 				if (count <= 0)
 					return true;
 				int requiredCount = count;
@@ -286,6 +288,17 @@ public enum Interaction {
 		return (action, player, npc, items) -> {
 			if (actions.length == 0 || List.of(actions).contains(action)) {
 				npc.moveTo(loc);
+				return true;
+			} else {
+				return false;
+			}
+		};
+	}
+
+	public static InteractOperation holdItem(ItemStack item, Interaction... actions) {
+		return (action, player, npc, items) -> {
+			if (actions.length == 0 || List.of(actions).contains(action)) {
+				npc.setHold(item);
 				return true;
 			} else {
 				return false;

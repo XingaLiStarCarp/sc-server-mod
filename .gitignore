@@ -1,5 +1,6 @@
 /bin
 /build
 /run
+/run-data
 
 forge*changelog.txt
