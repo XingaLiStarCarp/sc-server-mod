@@ -293,8 +293,11 @@ public class Npc extends Mob {
 
 	@SubscribeEvent
 	public static void onAttackEntity(AttackEntityEvent event) {
+		Player player = event.getEntity();
+		if (player.level().isClientSide()) {
+			return;
+		}
 		if (event.getTarget() instanceof Npc npc) {
-			Player player = event.getEntity();
 			npc.handleAttackEntity(player, npc, player.getMainHandItem());
 		}
 	}
@@ -328,8 +331,12 @@ public class Npc extends Mob {
 
 	@SubscribeEvent
 	public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+		Player player = event.getEntity();
+		if (player.level().isClientSide()) {
+			return;// 客户端操作跳过，只执行服务端
+		}
 		if (event.getTarget() instanceof Npc npc) {
-			npc.handleEntityInteract(event.getEntity(), npc, event.getHand(), event.getItemStack());
+			npc.handleEntityInteract(player, npc, event.getHand(), event.getItemStack());
 		}
 	}
 }

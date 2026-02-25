@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -100,5 +101,9 @@ public class Registers {
 		RegistryObject<Item> item = registerItem(itemName, () -> new BlockItem(block.get(), new Item.Properties()));
 		BLOCK_ITEMS.put(block, item);
 		return item;
+	}
+
+	public static final Item item(String type) {
+		return ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(type));
 	}
 }

@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import sc.server.api.registry.Registers;
 
 public enum Interaction {
 	ATTACK,
@@ -182,6 +183,10 @@ public enum Interaction {
 		};
 	}
 
+	public static InteractOperation receiveItemFromPlayerMainHand(String type, int count, Interaction... actions) {
+		return receiveItemFromPlayerMainHand(Registers.item(type), count, actions);
+	}
+
 	/**
 	 * 查找玩家背包的物品
 	 * 
@@ -237,6 +242,10 @@ public enum Interaction {
 				return false;
 			}
 		};
+	}
+
+	public static InteractOperation receiveItemFromPlayerInventory(String type, int count, Interaction... actions) {
+		return receiveItemFromPlayerInventory(Registers.item(type), count, actions);
 	}
 
 	public static InteractOperation giveItemToPlayer(ItemStack give_items, Interaction... actions) {
@@ -304,5 +313,44 @@ public enum Interaction {
 				return false;
 			}
 		};
+	}
+
+	public static InteractOperation clearHoldItem(ItemStack item, Interaction... actions) {
+		return holdItem(ItemStack.EMPTY, actions);
+	}
+
+	/**
+	 * 从玩家主手获取物品，并手持获取到的物品
+	 * 
+	 * @param type
+	 * @param count
+	 * @param actions
+	 * @return
+	 */
+	public static InteractOperation receiveItemFromPlayerMainHandAndHold(Item type, int count, Interaction... actions) {
+		return (action, player, npc, items) -> {
+			if ((actions.length == 0 && action == Interaction.USE_ITEM_MAINHAND) || List.of(actions).contains(action)) {
+				if (items.getItem() == type) {
+					int currentCount = items.getCount();
+					if (currentCount < count) {
+						return false;
+					} else {
+						items.setCount(currentCount - count);
+						ItemStack hold = items.copy();// 手持物品，需要拷贝
+						hold.setCount(count);
+						npc.setHold(hold);
+						return true;
+					}
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		};
+	}
+
+	public static InteractOperation receiveItemFromPlayerMainHandAndHold(String type, int count, Interaction... actions) {
+		return receiveItemFromPlayerMainHandAndHold(Registers.item(type), count, actions);
 	}
 }
