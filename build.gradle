@@ -134,6 +134,14 @@ repositories {
     	}
 	}
 	
+	maven {
+    	name = 'CurseForge'
+    	url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+	}
+	
     flatDir {
          dir 'lib'
     }
@@ -163,8 +171,11 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    // geckolib
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
     implementation("com.eliotlash.mclib:mclib:20")
+    // tlm
+    implementation fg.deobf("curse.maven:touhou-little-maid-${tlm_cf_id}:${tlm_cf_version_bin_file_id}-sources-${tlm_cf_version_src_file_id}")
 }
 
 mixin {

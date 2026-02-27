@@ -18,8 +18,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import sc.server.api.registry.Registers;
 import sc.server.block.Blocks;
-import sc.server.client.render.Renders;
-import sc.server.entity.npc.Customer;
+import sc.server.entity.npc.HumanoidCustomer;
+import sc.server.entity.npc.MaidCustomer;
 
 @Mod(ModEntry.MOD_ID)
 public class ModEntry {
@@ -38,7 +38,8 @@ public class ModEntry {
 
 		context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
-		Customer.init();
+		HumanoidCustomer.init();
+		MaidCustomer.init();
 	}
 
 	private void commonSetup(final FMLCommonSetupEvent event) {
@@ -57,7 +58,6 @@ public class ModEntry {
 		public static void onClientSetup(FMLClientSetupEvent event) {
 			LOGGER.info("onClientSetup");
 			event.enqueueWork(() -> {
-				Renders.init();
 			});
 		}
 	}

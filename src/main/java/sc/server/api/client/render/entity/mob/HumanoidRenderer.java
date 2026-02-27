@@ -1,4 +1,4 @@
-package sc.server.client.render.entity.npc;
+package sc.server.api.client.render.entity.mob;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -16,20 +16,18 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
 import net.minecraft.client.renderer.entity.layers.SpinAttackEffectLayer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.registries.RegistryObject;
-import sc.server.api.entity.npc.Gender;
-import sc.server.api.entity.npc.Npc;
-import sc.server.api.registry.Registers;
+import sc.server.api.entity.mob.HumanoidMob;
 
-@EventBusSubscriber(modid = Registers.MOD_ID, bus = Bus.MOD, value = Dist.CLIENT)
-public class NpcRenderer extends HumanoidMobRenderer<Npc, PlayerModel<Npc>> {
-	public NpcRenderer(EntityRendererProvider.Context context, boolean slim) {
+@OnlyIn(Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT, bus = Bus.MOD)
+public class HumanoidRenderer extends HumanoidMobRenderer<HumanoidMob, PlayerModel<HumanoidMob>> {
+	public HumanoidRenderer(EntityRendererProvider.Context context, boolean slim) {
 		super(context, new PlayerModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim), 0.5F);
 		// 盔甲层
 		this.addLayer(new HumanoidArmorLayer<>(this,
@@ -45,23 +43,25 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, PlayerModel<Npc>> {
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(Npc entity) {
-		return entity.skin();
+	public ResourceLocation getTextureLocation(HumanoidMob entity) {
+		return entity.getSkin();
 	}
 
 	@Override
-	public void render(Npc entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+	public void render(HumanoidMob entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		this.model.setAllVisible(true);
 		super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
 	}
 
-	public static final class Male extends NpcRenderer {
+	@OnlyIn(Dist.CLIENT)
+	public static final class Male extends HumanoidRenderer {
 		public Male(EntityRendererProvider.Context context) {
 			super(context, false);
 		}
 	}
 
-	public static final class Female extends NpcRenderer {
+	@OnlyIn(Dist.CLIENT)
+	public static final class Female extends HumanoidRenderer {
 		public Female(EntityRendererProvider.Context context) {
 			super(context, true);
 		}
@@ -69,15 +69,7 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, PlayerModel<Npc>> {
 
 	@SubscribeEvent
 	public static void register(EntityRenderersEvent.RegisterRenderers event) {
-		for (RegistryObject<EntityType<Npc>> maleType : Gender.MALE.getTypes()) {
-			event.registerEntityRenderer(maleType.get(), NpcRenderer.Male::new);
-		}
-		for (RegistryObject<EntityType<Npc>> femaleType : Gender.FEMALE.getTypes()) {
-			event.registerEntityRenderer(femaleType.get(), NpcRenderer.Female::new);
-		}
-	}
-
-	public static void init() {
-
+		HumanoidMob.MALE_RENDERER_TYPE.register(event);
+		HumanoidMob.FEMALE_RENDERER_TYPE.register(event);
 	}
 }
