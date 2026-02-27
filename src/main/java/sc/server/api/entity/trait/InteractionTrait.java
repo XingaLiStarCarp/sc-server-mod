@@ -20,7 +20,7 @@ public abstract class InteractionTrait extends DualEndedTrait {
 		if (this.validate(player)) {
 			InteractionHand hand = event.getHand();
 			if (player.getUsedItemHand() == hand) {
-				this.interact(player, mob, hand);
+				this.interact(event, player, mob, hand);
 			}
 		}
 		return true;
@@ -49,5 +49,5 @@ public abstract class InteractionTrait extends DualEndedTrait {
 	 * @param hand
 	 * @param isClient
 	 */
-	public abstract void interact(Player player, BaseMob mob, InteractionHand hand);
+	public abstract void interact(PlayerInteractEvent.EntityInteract event, Player player, BaseMob mob, InteractionHand hand);
 }
