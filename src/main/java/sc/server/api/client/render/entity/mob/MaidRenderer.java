@@ -18,14 +18,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import sc.server.api.entity.mob.MaidMob;
+import sc.server.api.entity.mob.RenderableMaid;
 
 /**
  * Touhou Little Maid模组的实体渲染
  */
 @EventBusSubscriber(value = Dist.CLIENT, bus = Bus.MOD)
-public class MaidRenderer extends EntityRenderer<MaidMob> {
-	protected EntityMaidRenderer entityMaidRenderer;
-	protected IGeoEntityRenderer<Mob> ysmMaidRenderer;
+public class MaidRenderer extends EntityRenderer<Mob> {
+	protected final EntityMaidRenderer entityMaidRenderer;
+	protected final IGeoEntityRenderer<Mob> ysmMaidRenderer;
 
 	@SuppressWarnings("unchecked")
 	public MaidRenderer(EntityRendererProvider.Context context) {
@@ -35,9 +36,19 @@ public class MaidRenderer extends EntityRenderer<MaidMob> {
 	}
 
 	@Override
-	public void render(MaidMob entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+	public void render(Mob mob, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		// YSM渲染依赖entity.getCapability()，如果获取到的IGeoEntity Capability为empty，则不执行渲染。因此CapabilityProvider必须正确初始化。
-		entityMaidRenderer.render(entity.renderingEntity(), entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+		if (mob instanceof RenderableMaid maid) {
+			entityMaidRenderer.render(maid.renderingEntity(), entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+		}
+	}
+
+	@Override
+	public ResourceLocation getTextureLocation(Mob mob) {
+		if (mob instanceof RenderableMaid maid)
+			return entityMaidRenderer.getTextureLocation(maid.renderingEntity());
+		else
+			return null;
 	}
 
 	public IGeoEntity getOrCreateYsmGeoEntityCapability(EntityMaid maidEntity) {
@@ -47,11 +58,6 @@ public class MaidRenderer extends EntityRenderer<MaidMob> {
 		geoEntity.setYsmModel(maidEntity.getYsmModelId(), maidEntity.getYsmModelTexture());
 		geoEntity.updateRoamingVars(maidEntity.roamingVars);
 		return geoEntity;
-	}
-
-	@Override
-	public ResourceLocation getTextureLocation(MaidMob mob) {
-		return entityMaidRenderer.getTextureLocation(mob.renderingEntity());
 	}
 
 	@SubscribeEvent
