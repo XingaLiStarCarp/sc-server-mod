@@ -1,10 +1,11 @@
 package sc.server.api.entity;
 
-import java.lang.reflect.Constructor;
+import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import jvmsp.symbols;
 import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -72,9 +73,8 @@ public abstract class BaseMob extends PathfinderMob {
 		RegistryObject<EntityType<BaseMob>> type = Registers.ENTITIES_REG.register(typeName,
 				() -> EntityType.Builder.of((EntityType<BaseMob> entityType, Level level) -> {
 					try {
-						Constructor<T> constructor = entityClazz.getDeclaredConstructor(EntityType.class, EntityRendererType.class, Level.class);
-						constructor.setAccessible(true);
-						return constructor.newInstance(entityType, rendererType, level);
+						MethodHandle constructor = symbols.find_constructor(entityClazz, EntityType.class, EntityRendererType.class, Level.class);
+						return (T) constructor.invoke(entityType, rendererType, level);
 					} catch (Throwable ex) {
 						ModEntry.LOGGER.error("create base mob of type '" + typeName + "' failed", ex);
 						return null;
@@ -99,9 +99,10 @@ public abstract class BaseMob extends PathfinderMob {
 		return newType(entityClazz, width, height, renderType, typeName, MobCategory.MISC, attributes);
 	}
 
-	public static final List<Entry> BASIC_ATTRIBUTES = List.of(
+	public static final List<Entry> PLAYER_ATTRIBUTES = List.of(
 			Entry.of(Attributes.MAX_HEALTH, 20),
-			Entry.of(Attributes.FOLLOW_RANGE, 32));
+			Entry.of(Attributes.MOVEMENT_SPEED, 0.25), // 与玩家的默认移动速度相同
+			Entry.of(Attributes.FOLLOW_RANGE, 16));
 
 	private boolean pushable;
 	private boolean attackable;
@@ -354,7 +355,7 @@ public abstract class BaseMob extends PathfinderMob {
 	 * @param paramClazz
 	 * @return
 	 */
-	public <_Param> boolean executeComponent(Class<_Param> paramClazz, _Param param) {
+	public <_Param> boolean executeOpComponent(Class<_Param> paramClazz, _Param param) {
 		return this.opComponent(paramClazz).execute(param);
 	}
 
@@ -365,11 +366,11 @@ public abstract class BaseMob extends PathfinderMob {
 	 */
 	@SubscribeEvent
 	public static void onLivingAttackEvent(LivingAttackEvent event) {
-		if (event.getEntity() instanceof BaseMob damagee) {
-			damagee.executeComponent(LivingAttackEvent.class, event);
-		}
 		if (event.getSource().getEntity() instanceof BaseMob damager) {
-			damager.executeComponent(LivingAttackEvent.class, event);
+			damager.executeOpComponent(LivingAttackEvent.class, event);
+		}
+		if (event.getEntity() instanceof BaseMob damagee) {
+			damagee.executeOpComponent(LivingAttackEvent.class, event);
 		}
 	}
 
@@ -381,7 +382,7 @@ public abstract class BaseMob extends PathfinderMob {
 	@SubscribeEvent
 	public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
 		if (event.getTarget() instanceof BaseMob baseMob) {
-			baseMob.executeComponent(PlayerInteractEvent.EntityInteract.class, event);
+			baseMob.executeOpComponent(PlayerInteractEvent.EntityInteract.class, event);
 		}
 	}
 }

@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.RegistryObject;
 
 /**
@@ -20,7 +19,7 @@ public class EntityRendererType<_RenderAsset> {
 	// 每种实体渲染类型都有哪些EntityType
 	private final ArrayList<RegistryObject<EntityType<?>>> entityTypes;
 
-	// 默认的渲染使用信息
+	// 默认的渲染使用的全部模型、纹理数据
 	private _RenderAsset defaultRenderAsset;
 
 	public EntityRendererType(Class<? extends EntityRenderer<?>> rendererClazz, _RenderAsset defaultRenderAsset) {
@@ -66,7 +65,6 @@ public class EntityRendererType<_RenderAsset> {
 		this.defaultRenderAsset = ra;
 	}
 
-	@SubscribeEvent
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void register(EntityRenderersEvent.RegisterRenderers event) {
 		for (RegistryObject<EntityType<?>> type : entityTypes) {

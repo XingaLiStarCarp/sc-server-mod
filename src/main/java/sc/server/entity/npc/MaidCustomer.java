@@ -15,7 +15,7 @@ public class MaidCustomer extends MaidMob {
 
 	public static final String CUSTOMER_MAID_TYPE_NAME = "npc_maid_customer";
 
-	public static final RegistryObject<EntityType<MaidCustomer>> CUSTOMER_MAID_TYPE = BaseMob.newType(MaidCustomer.class, HUMANOID_WIDTH, HUMANOID_HEIGHT, MaidMob.RENDERER_TYPE, CUSTOMER_MAID_TYPE_NAME, BaseMob.BASIC_ATTRIBUTES);
+	public static final RegistryObject<EntityType<MaidCustomer>> CUSTOMER_MAID_TYPE = MaidMob.newType(MaidCustomer.class, HUMANOID_WIDTH, HUMANOID_HEIGHT, CUSTOMER_MAID_TYPE_NAME, BaseMob.PLAYER_ATTRIBUTES);
 
 	public MaidCustomer(EntityType<BaseMob> entityType, EntityRendererType<String> rendererType, Level level) {
 		super(entityType, rendererType, level);

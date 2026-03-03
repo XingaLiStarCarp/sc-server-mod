@@ -19,11 +19,11 @@ import sc.server.entity.npc.trait.CustomerTrait;
 public class HumanoidCustomer extends HumanoidMob {
 	public static final String CUSTOMER_MALE_TYPE_NAME = "npc_male_customer";
 
-	public static final RegistryObject<EntityType<HumanoidCustomer>> CUSTOMER_MALE_TYPE = BaseMob.newType(HumanoidCustomer.class, HUMANOID_WIDTH, HUMANOID_HEIGHT, HumanoidMob.MALE_RENDERER_TYPE, CUSTOMER_MALE_TYPE_NAME, BaseMob.BASIC_ATTRIBUTES);
+	public static final RegistryObject<EntityType<HumanoidCustomer>> CUSTOMER_MALE_TYPE = HumanoidMob.newMaleType(HumanoidCustomer.class, HUMANOID_WIDTH, HUMANOID_HEIGHT, CUSTOMER_MALE_TYPE_NAME, BaseMob.PLAYER_ATTRIBUTES);
 
 	public static final String CUSTOMER_FEMALE_TYPE_NAME = "npc_female_customer";
 
-	public static final RegistryObject<EntityType<HumanoidCustomer>> CUSTOMER_FEMALE_TYPE = BaseMob.newType(HumanoidCustomer.class, HUMANOID_WIDTH, HUMANOID_HEIGHT, HumanoidMob.FEMALE_RENDERER_TYPE, CUSTOMER_FEMALE_TYPE_NAME, BaseMob.BASIC_ATTRIBUTES);
+	public static final RegistryObject<EntityType<HumanoidCustomer>> CUSTOMER_FEMALE_TYPE = HumanoidMob.newFemaleType(HumanoidCustomer.class, HUMANOID_WIDTH, HUMANOID_HEIGHT, CUSTOMER_FEMALE_TYPE_NAME, BaseMob.PLAYER_ATTRIBUTES);
 
 	protected CombinedTask consumeItems;
 
