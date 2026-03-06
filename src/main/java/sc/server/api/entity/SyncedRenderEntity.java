@@ -3,8 +3,10 @@ package sc.server.api.entity;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -82,10 +84,10 @@ public interface SyncedRenderEntity<_RenderingEntity extends Entity, _Model> {
 	 */
 	@EventBusSubscriber(value = Dist.CLIENT, bus = Bus.FORGE)
 	public static abstract class ModelBinder<_RenderingEntity extends Entity, _Model> implements SyncedRenderEntity<_RenderingEntity, _Model> {
-		private Entity bindEntity;
+		protected final Entity bindEntity;
 		protected final _Model model;
 
-		private _RenderingEntity renderingEntity;
+		protected final _RenderingEntity renderingEntity;
 
 		@Override
 		public final _RenderingEntity renderingEntity() {
@@ -104,12 +106,20 @@ public interface SyncedRenderEntity<_RenderingEntity extends Entity, _Model> {
 			return (_Binder) BINDERS.computeIfAbsent(bindEntity, binderProvider);
 		}
 
-		protected static final <_RenderingEntity extends Entity, _Model, _Binder extends ModelBinder<_RenderingEntity, _Model>> _Binder bind(BiFunction<Entity, _Model, _Binder> ctor, Entity bindEntity, _Model model) {
-			return bind(bindEntity, (newEntity) -> ctor.apply(newEntity, model));
+		protected static final <_RenderingEntity extends Entity, _Model, _Binder extends ModelBinder<_RenderingEntity, _Model>> _Binder bind(BiFunction<Entity, _Model, _Binder> binderCtor, Entity bindEntity, _Model model) {
+			return bind(bindEntity, (newEntity) -> binderCtor.apply(newEntity, model));
 		}
 
-		protected static final <_RenderingEntity extends Entity, _Model, _Binder extends ModelBinder<_RenderingEntity, _Model>> _Binder bind(Entity bindEntity, Function<Entity, _Model> modelProvider, BiFunction<Entity, _Model, _Binder> ctor) {
-			return bind(ctor, bindEntity, modelProvider.apply(bindEntity));
+		protected static final <_RenderingEntity extends Entity, _Model, _Binder extends ModelBinder<_RenderingEntity, _Model>> _Binder bind(Entity bindEntity, Function<Entity, _Model> modelProvider, BiFunction<Entity, _Model, _Binder> binderCtor) {
+			return bind(binderCtor, bindEntity, modelProvider.apply(bindEntity));
+		}
+
+		protected static final <_RenderingEntity extends Entity, _Model, _Binder extends ModelBinder<_RenderingEntity, _Model>> _Binder bind(Entity bindEntity, Supplier<_Model> modelProvider, BiConsumer<Entity, _Model> modelResolver, BiFunction<Entity, _Model, _Binder> binderCtor) {
+			return bind(bindEntity, (newEntity) -> {
+				_Model model = modelProvider.get();
+				modelResolver.accept(bindEntity, model);
+				return model;
+			}, binderCtor);
 		}
 
 		protected static final void unbind(Entity bindEntity) {

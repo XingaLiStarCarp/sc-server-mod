@@ -15,24 +15,21 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.RegistryObject;
 import sc.server.ModEntry;
+import sc.server.api.component.OpProvider;
+import sc.server.api.component.TraitProvider;
 import sc.server.api.entity.EntityDefaultAttributes.Entry;
 import sc.server.api.registry.Registers;
 
-@EventBusSubscriber(modid = Registers.MOD_ID, bus = Bus.FORGE)
-public abstract class BaseMob extends PathfinderMob {
+public abstract class BaseMob extends PathfinderMob implements TraitProvider<BaseMob>, OpProvider<BaseMob> {
 
 	private final EntityRendererType<?> rendererType;
 
@@ -123,7 +120,7 @@ public abstract class BaseMob extends PathfinderMob {
 	 * 定义并初始化实体数据字段默认值
 	 */
 	@Override
-	protected final void defineSynchedData() {
+	protected void defineSynchedData() {
 		super.defineSynchedData();
 		EntityData.defineAll(this);
 	}
@@ -278,126 +275,29 @@ public abstract class BaseMob extends PathfinderMob {
 		}
 	}
 
-	private final ArrayList<TraitComponent> traitComponents = new ArrayList<>();
+	private final ArrayList<TraitComponent<BaseMob>> traitComponents = new ArrayList<>();
 
-	/**
-	 * 特征组件，所有种类的行为组件都必须实现此接口
-	 */
-	public static interface TraitComponent {
-		public default void init(BaseMob mob) {
-
-		}
-
-		public default void uninit(BaseMob mob) {
-
-		}
+	@Override
+	public final ArrayList<TraitComponent<BaseMob>> getTraits() {
+		return traitComponents;
 	}
 
-	public final void addTrait(TraitComponent trait) {
-		traitComponents.add(trait);
-		trait.init(this);
-	}
+	private final HashMap<Class<?>, OpComponent<BaseMob, ?>> opComponents = new HashMap<>();
 
-	public final void removeTrait(TraitComponent trait) {
-		traitComponents.remove(trait);
-		trait.uninit(this);
-	}
-
-	private final HashMap<Class<?>, OpComponent<?>> opComponents = new HashMap<>();
-
-	/**
-	 * 行为组件
-	 */
-	public static final class OpComponent<_Param> {
-		@FunctionalInterface
-		public static interface Operation<_Param> {
-			/**
-			 * 执行一段动作
-			 * 
-			 * @param param 任意参数
-			 * @return 是否继续遍历执行下一个操作
-			 */
-			public boolean operate(BaseMob mob, _Param param);
-		}
-
-		private BaseMob mob;
-		private ArrayList<Operation<_Param>> ops;
-
-		private OpComponent(BaseMob mob) {
-			this.mob = mob;
-			this.ops = new ArrayList<>();
-		}
-
-		public void add(Operation<_Param> op) {
-			ops.add(op);
-		}
-
-		public void remove(Operation<_Param> op) {
-			ops.remove(op);
-		}
-
-		/**
-		 * 执行全部行为
-		 * 
-		 * @param param
-		 * @return 是否所有行为都执行成功
-		 */
-		public boolean execute(_Param param) {
-			for (Operation<_Param> op : ops) {
-				if (!op.operate(mob, param))
-					return false;
-			}
-			return true;
-		}
+	@Override
+	public final HashMap<Class<?>, OpComponent<BaseMob, ?>> getOpComponents() {
+		return opComponents;
 	}
 
 	/**
-	 * 获取实体的行为组件，若不存在则新建一个对应的行为组件。
-	 * 
-	 * @param <_Param>
-	 * @param paramClazz 参数类型
-	 * @return
+	 * 暂停实体的行为
 	 */
-	@SuppressWarnings("unchecked")
-	public <_Param> OpComponent<_Param> opComponent(Class<_Param> paramClazz) {
-		return (OpComponent<_Param>) opComponents.computeIfAbsent(paramClazz, (k) -> new OpComponent<>(this));
+	public void pause() {
+		EntityInteractions.pause(this);
 	}
 
-	/**
-	 * 执行行为
-	 * 
-	 * @param <_Param>
-	 * @param paramClazz
-	 * @return
-	 */
-	public <_Param> boolean executeOpComponent(Class<_Param> paramClazz, _Param param) {
-		return this.opComponent(paramClazz).execute(param);
-	}
-
-	/**
-	 * 实体攻击/被攻击时执行的行为
-	 * 
-	 * @param event
-	 */
-	@SubscribeEvent
-	public static void onLivingAttackEvent(LivingAttackEvent event) {
-		if (event.getSource().getEntity() instanceof BaseMob damager) {
-			damager.executeOpComponent(LivingAttackEvent.class, event);
-		}
-		if (event.getEntity() instanceof BaseMob damagee) {
-			damagee.executeOpComponent(LivingAttackEvent.class, event);
-		}
-	}
-
-	/**
-	 * 实体被交互时执行的行为
-	 * 
-	 * @param event
-	 */
-	@SubscribeEvent
-	public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-		if (event.getTarget() instanceof BaseMob baseMob) {
-			baseMob.executeOpComponent(PlayerInteractEvent.EntityInteract.class, event);
-		}
+	public void fakeDie() {
+		this.setPose(Pose.SLEEPING);// 设置为睡姿
+		this.pause();
 	}
 }

@@ -8,11 +8,13 @@ import java.util.function.Function;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import sc.server.api.registry.Registers;
 
 /**
@@ -190,5 +192,10 @@ public class EntityInteractions {
 
 	public static boolean receiveItemFromPlayerMainHandAndHold(Player player, LivingEntity entity, String type, int count) {
 		return receiveItemFromPlayerMainHandAndHold(player, entity, Registers.item(type), count);
+	}
+
+	public static final void pause(Entity entity) {
+		entity.setDeltaMovement(Vec3.ZERO);// 停止移动
+		entity.setSilent(true);// 停止实体声音
 	}
 }

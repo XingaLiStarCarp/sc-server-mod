@@ -26,7 +26,7 @@ public class MaidModelReplacer {
 		});
 		MaidModelDispatcher.dispatch(EntityType.IRON_GOLEM, (entity, model) -> {
 			model.setIsYsmModel(true);
-			model.setYsmModelId("BA_圣园未花3.0.ysm");
+			model.setYsmModelId(MaidModelAsset.hashLocalCustomYsmModelId(entity.getUUID()));
 		});
 	}
 }

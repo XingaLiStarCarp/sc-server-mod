@@ -17,6 +17,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import sc.server.api.ModPaths;
+import sc.server.api.entity.maid.SyncedRenderMaid.MaidModelAsset;
 import sc.server.api.registry.Registers;
 import sc.server.block.Blocks;
 
@@ -31,6 +32,8 @@ public class ModEntry {
 		// 注册注册表条目
 		Registers.register(modEventBus);
 		Blocks.register();
+
+		LOGGER.warn(MaidModelAsset.LOCAL_CUSTOM_YSM_MODEL_DIR.toString());
 
 		modEventBus.addListener(this::commonSetup);
 

@@ -1,0 +1,66 @@
+package sc.server.api.component.trait.entity;
+
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import sc.server.api.component.OpProvider;
+import sc.server.api.component.trait.DualEndedTrait;
+import sc.server.api.component.trait.OpTrait;
+
+/**
+ * 交互特性类。<br>
+ * 交互事件是双端事件，客户端与服务端会分别触发一次，如果是本地游戏则触发两次。<br>
+ */
+@EventBusSubscriber(bus = Bus.FORGE)
+public abstract class InteractionTrait<_TargetEntity extends Entity & OpProvider<_TargetEntity>> extends OpTrait<_TargetEntity, PlayerInteractEvent.EntityInteract, InteractionTrait<_TargetEntity>> implements DualEndedTrait<_TargetEntity> {
+	private final boolean isClient;
+
+	public InteractionTrait(boolean isClient) {
+		super(PlayerInteractEvent.EntityInteract.class);
+		this.isClient = isClient;
+	}
+
+	protected boolean op(_TargetEntity target, PlayerInteractEvent.EntityInteract event) {
+		Player player = event.getEntity();
+		// 判断端
+		if (this.validate(player)) {
+			InteractionHand hand = event.getHand();
+			if (player.getUsedItemHand() == hand) {
+				this.interact(event, player, target, hand);
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public final boolean isClient() {
+		return isClient;
+	}
+
+	/**
+	 * 交互事件。<br>
+	 * 
+	 * @param player
+	 * @param mob
+	 * @param hand
+	 * @param isClient
+	 */
+	public abstract void interact(PlayerInteractEvent.EntityInteract event, Player player, _TargetEntity target, InteractionHand hand);
+
+	/**
+	 * 实体被交互时执行的行为
+	 * 
+	 * @param event
+	 */
+	@SubscribeEvent
+	@SuppressWarnings("unchecked")
+	public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+		if (event.getTarget() instanceof OpProvider baseMob) {
+			baseMob.executeOpComponent(PlayerInteractEvent.EntityInteract.class, event);
+		}
+	}
+}

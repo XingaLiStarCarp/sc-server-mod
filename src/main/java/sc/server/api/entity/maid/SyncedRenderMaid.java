@@ -28,6 +28,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import sc.server.ModEntry;
 import sc.server.api.ModPaths;
 import sc.server.api.capability.CapabilityData;
 import sc.server.api.entity.EntityData;
@@ -187,17 +188,18 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 		 */
 		public static final List<String> retrieveLocalCustomYsmModelIds() {
 			LOCAL_CUSTOM_YSM_MODEL_IDS.clear();
-			try (Stream<Path> paths = Files.walk(LOCAL_CUSTOM_YSM_MODEL_DIR)) {
+			try (Stream<Path> paths = Files.list(LOCAL_CUSTOM_YSM_MODEL_DIR)) {
 				paths.forEach(file -> {
+					String name = file.getFileName().toString();
 					if (Files.isRegularFile(file)) {
-						if (file.endsWith(YSM_EXTENSION_NAME))
-							LOCAL_CUSTOM_YSM_MODEL_IDS.add(file.getFileName().toString());// 文件只要.ysm文件
+						if (name.endsWith(YSM_EXTENSION_NAME))
+							LOCAL_CUSTOM_YSM_MODEL_IDS.add(name);// 文件只要.ysm文件
 					} else {
-						LOCAL_CUSTOM_YSM_MODEL_IDS.add(file.getFileName().toString());// 文件夹则直接加入
+						LOCAL_CUSTOM_YSM_MODEL_IDS.add(name);// 文件夹则直接加入
 					}
 				});
 			} catch (IOException ex) {
-				throw new java.lang.InternalError("retrieve local custom ysm model ids failed", ex);
+				ModEntry.LOGGER.warn("retrieve local custom ysm model ids failed", ex);
 			}
 			return LOCAL_CUSTOM_YSM_MODEL_IDS;
 		}
@@ -253,25 +255,25 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 		return blankEntityMaid(bindEntity);
 	}
 
-	String getTlmModelId();
+	public String getTlmModelId();
 
-	void setTlmModelId(String modelId);
+	public void setTlmModelId(String modelId);
 
-	boolean isYsmModel();
+	public boolean isYsmModel();
 
-	void setIsYsmModel(boolean isYsmModel);
+	public void setIsYsmModel(boolean isYsmModel);
 
-	String getYsmModelId();
+	public String getYsmModelId();
 
-	void setYsmModelId(String ysmModelId);
+	public void setYsmModelId(String ysmModelId);
 
-	String getYsmModelTexture();
+	public String getYsmModelTexture();
 
-	void setYsmModelTexture(String ysmModelTexture);
+	public void setYsmModelTexture(String ysmModelTexture);
 
-	Component getYsmModelName();
+	public Component getYsmModelName();
 
-	void setYsmModelName(Component ysmModelName);
+	public void setYsmModelName(Component ysmModelName);
 
 	/**
 	 * 设置YSM模型
@@ -298,6 +300,20 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 		renderingEntity.setIsYsmModel(this.isYsmModel());
 		renderingEntity.setYsmModel(this.getYsmModelId(), this.getYsmModelTexture(), this.getYsmModelName());
 		return renderingEntity;
+	}
+
+	/**
+	 * 设置使得女仆抬起或放下主手。<br>
+	 * 女仆的攻击动画都需要手动设置。<br>
+	 * 
+	 * @param swingingArms
+	 */
+	public default void setSwingingArms(boolean swingingArms) {
+		renderingEntity().setSwingingArms(swingingArms);
+	}
+
+	public default boolean isSwingingArms() {
+		return renderingEntity().isSwingingArms();
 	}
 
 	public default void playRouletteAnim(String rouletteAnim) {
@@ -333,11 +349,7 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 		}
 
 		public static final SyncedRenderMaid bind(Entity bindEntity, BiConsumer<Entity, MaidModelAsset> modelResolver) {
-			return bind(bindEntity, (newEntity) -> {
-				MaidModelAsset model = new MaidModelAsset();
-				modelResolver.accept(bindEntity, model);
-				return model;
-			}, SyncedRenderMaid.Binder::new);
+			return bind(bindEntity, MaidModelAsset::new, modelResolver, SyncedRenderMaid.Binder::new);
 		}
 
 		protected Binder(Entity bindEntity, MaidModelAsset model) {

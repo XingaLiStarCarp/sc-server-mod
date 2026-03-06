@@ -1,6 +1,7 @@
 package sc.server.api.entity.goal;
 
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 
@@ -55,12 +56,15 @@ public class UseItemMeleeAttackGoal extends MeleeAttackGoal {
 	@Override
 	public void tick() {
 		super.tick();
-		double distanceToTarget = this.mob.distanceToSqr(this.mob.getTarget());
-		double usingDistanceSqr = this.usingDistance * this.usingDistance;
-		if (distanceToTarget < usingDistanceSqr) {
-			this.startUsing();
-		} else {
-			this.stopUsing();
+		LivingEntity target = this.mob.getTarget();
+		if (target != null) {
+			double distanceToTarget = this.mob.distanceToSqr(target);
+			double usingDistanceSqr = this.usingDistance * this.usingDistance;
+			if (distanceToTarget < usingDistanceSqr) {
+				this.startUsing();
+			} else {
+				this.stopUsing();
+			}
 		}
 	}
 
