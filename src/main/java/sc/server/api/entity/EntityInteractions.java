@@ -12,11 +12,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -264,5 +266,23 @@ public class EntityInteractions {
 		if (horizontalSpeedFasterThan(entity, speed)) {
 			spawnGroundParticles(entity, spwanInterval, 0.1, 10.0, 1.0);
 		}
+	}
+
+	public static final void startUsingItem(LivingEntity entity, InteractionHand hand) {
+		Item item = entity.getItemInHand(hand).getItem();
+		if (item instanceof ShieldItem) {
+			entity.level().broadcastEntityEvent(entity, EntityEvent.SHIELD_DISABLED);
+		} else {
+			entity.swing(hand);
+		}
+		entity.startUsingItem(hand);
+	}
+
+	public static final void stopUsingItem(LivingEntity entity, InteractionHand hand) {
+		Item item = entity.getItemInHand(hand).getItem();
+		if (item instanceof ShieldItem) {
+			entity.level().broadcastEntityEvent(entity, EntityEvent.ATTACK_BLOCKED);
+		}
+		entity.stopUsingItem();
 	}
 }

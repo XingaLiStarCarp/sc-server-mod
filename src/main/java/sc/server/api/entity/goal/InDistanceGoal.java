@@ -11,7 +11,7 @@ public abstract class InDistanceGoal extends BaseGoal {
 	}
 
 	public InDistanceGoal(Mob mob, double distance) {
-		this(mob, distance, 1);
+		this(mob, distance, DEFAULT_TICK_INTERVAL);
 	}
 
 	public double getDistanceSqr() {
@@ -24,6 +24,6 @@ public abstract class InDistanceGoal extends BaseGoal {
 
 	@Override
 	public boolean canUse() {
-		return this.checkTarget() && this.distanceSqrToTarget() <= distanceSqr;
+		return this.checkMobTarget() && this.distanceSqrToTarget() <= distanceSqr;
 	}
 }

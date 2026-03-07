@@ -2,6 +2,7 @@ package sc.server.api.entity.goal;
 
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Mob;
+import sc.server.api.entity.EntityInteractions;
 
 public class UseItemGoal extends InDistanceGoal {
 
@@ -39,8 +40,7 @@ public class UseItemGoal extends InDistanceGoal {
 		useTimeCounter = 0;
 		useIntervalCounter = 0;
 		if (useTime <= 0) {
-			this.mob.swing(hand);
-			this.mob.startUsingItem(hand);// 使用时间小于等于0时，视为永久使用直到该Goal执行结束
+			EntityInteractions.startUsingItem(mob, hand);// 使用时间小于等于0时，视为永久使用直到该Goal执行结束
 			return;
 		}
 	}
@@ -49,15 +49,14 @@ public class UseItemGoal extends InDistanceGoal {
 	public void update() {
 		if (useTime > 0) {
 			if (useTimeCounter <= 0) {
-				this.mob.swing(hand);
-				this.mob.startUsingItem(hand);
+				EntityInteractions.startUsingItem(mob, hand);
 			}
 			if (useTimeCounter < useTime) {
 				++useTimeCounter;
 			} else {
 				// 当物品使用时间达到阈值useTime
 				if (useIntervalCounter <= 0) {
-					this.mob.stopUsingItem();
+					EntityInteractions.stopUsingItem(mob, hand);
 				} else {
 					++useIntervalCounter;
 				}
@@ -72,7 +71,7 @@ public class UseItemGoal extends InDistanceGoal {
 
 	@Override
 	public void exit() {
-		this.mob.stopUsingItem();
+		EntityInteractions.stopUsingItem(mob, hand);
 		useTimeCounter = 0;
 		useIntervalCounter = 0;
 	}

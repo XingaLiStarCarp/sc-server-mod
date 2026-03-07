@@ -1,25 +1,24 @@
 package sc.server.api.entity.goal;
 
 import net.minecraft.world.entity.Mob;
-import sc.server.api.entity.EntityData;
 
 /**
  * 疾跑与目标实体保持距离
  */
-public class SprintKeepDistanceGoal extends KeepDistanceGoal {
+public class SprintKeepDistanceToTargetGoal extends KeepDistanceToTargetGoal {
 	protected double finalSpeedModifier;
 	private int speedUpTicks;
 	private double speedUpAcc;
 
-	public SprintKeepDistanceGoal(Mob mob, double keepDistance, double tolerance, double finalSpeedModifier, int speedUpTicks, boolean interrupt) {
-		super(mob, keepDistance, tolerance, 1.0, interrupt);
+	public SprintKeepDistanceToTargetGoal(Mob mob, double keepDistance, double tolerance, double finalSpeedModifier, int speedUpTicks, boolean interrupt, int updateTicks) {
+		super(mob, keepDistance, tolerance, 1.0, interrupt, updateTicks);
 		this.finalSpeedModifier = finalSpeedModifier;
 		this.speedUpTicks = speedUpTicks;
 		this.speedUpAcc = finalSpeedModifier / speedUpTicks;
 	}
 
-	public SprintKeepDistanceGoal(Mob mob, double keepDistance, double tolerance, double finalSpeedModifier, int speedUpTicks) {
-		this(mob, keepDistance, tolerance, finalSpeedModifier, speedUpTicks, true);
+	public SprintKeepDistanceToTargetGoal(Mob mob, double keepDistance, double tolerance, double finalSpeedModifier, int speedUpTicks) {
+		this(mob, keepDistance, tolerance, finalSpeedModifier, speedUpTicks, true, DEFAULT_UPDATE_TICKS);
 	}
 
 	public int getSpeedUpTicks() {
@@ -42,13 +41,15 @@ public class SprintKeepDistanceGoal extends KeepDistanceGoal {
 
 	@Override
 	public void update() {
-		if (!mob.level().isClientSide()) {
-			double speedModifier = EntityData.getSpeedModifier(navigation);
-			System.err.println("speedModifier=" + speedModifier);
-			if (speedModifier < finalSpeedModifier) {
-				navigation.setSpeedModifier(speedModifier + speedUpAcc);
-			}
-		}
 		super.update();
+		if (!mob.level().isClientSide()) {
+			double currentSpeedModifier = 1.0;
+			if (this.getTargetTicks() < this.speedUpTicks) {
+				currentSpeedModifier += this.getTargetTicks() * speedUpAcc;
+			} else {
+				currentSpeedModifier = this.finalSpeedModifier;
+			}
+			navigation.setSpeedModifier(currentSpeedModifier);
+		}
 	}
 }

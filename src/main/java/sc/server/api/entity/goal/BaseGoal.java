@@ -71,6 +71,7 @@ public abstract class BaseGoal extends Goal {
 
 	/**
 	 * 获取从Goal执行开始到现在已经的tick数，不包含本次tick。<br>
+	 * 对于导航类型的Goal，同一个目标通常会调用start()多次，每次都会导致ticks清零，不能使用此方法判断总tick数。<br>
 	 * 
 	 * @return
 	 */
@@ -88,12 +89,11 @@ public abstract class BaseGoal extends Goal {
 	}
 
 	/**
-	 * 检查当前目标是否合法。<br>
-	 * 需要目标均非null且必须存活。<br>
+	 * 检查当前Goal的目标是否合法。<br>
 	 * 
 	 * @return
 	 */
-	public final boolean checkTarget() {
+	public final boolean checkMobTarget() {
 		LivingEntity target = this.mob.getTarget();
 		return target != null && target.isAlive();
 	}

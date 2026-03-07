@@ -13,7 +13,7 @@ import sc.server.api.entity.EntityDefaultAttributes.Entry;
 import sc.server.api.entity.goal.MeleeAttackGoal;
 import sc.server.api.entity.goal.MobGoalUtils;
 import sc.server.api.entity.goal.NearestTargetGoal;
-import sc.server.api.entity.goal.SprintKeepDistanceGoal;
+import sc.server.api.entity.goal.SprintKeepDistanceToTargetGoal;
 import sc.server.api.entity.goal.UseItemGoal;
 import sc.server.api.registry.Registers;
 
@@ -21,7 +21,7 @@ public class GuardTrait extends GoalTrait<BaseMob> {
 	public static final List<Entry> GUARD_ATTRIBUTES = List.of(
 			Entry.of(Attributes.MAX_HEALTH, 100),
 			Entry.of(Attributes.MOVEMENT_SPEED, 0.2),
-			Entry.of(Attributes.FOLLOW_RANGE, 32),
+			Entry.of(Attributes.FOLLOW_RANGE, 64),
 			Entry.of(Attributes.ARMOR, 20),
 			Entry.of(Attributes.ARMOR_TOUGHNESS, 10),
 			Entry.of(Attributes.KNOCKBACK_RESISTANCE, 0.8),
@@ -35,11 +35,11 @@ public class GuardTrait extends GoalTrait<BaseMob> {
 	public GuardTrait(String mainHandItem, String offhandItem, MobCategory attackCategory, int speedUpTicks) {
 		super();
 		this.add(0, (mob) -> new MeleeAttackGoal(mob, 2));
-		this.add(0, (mob) -> new UseItemGoal(mob, 2));
-		this.add(0, (mob) -> new SprintKeepDistanceGoal(mob, 0.5, 0.5, 3.0, 40));
-		this.add(0, (mob) -> new NearestTargetGoal(mob, true, true, MobGoalUtils.entityCategory(attackCategory)));
-		this.add(1, (mob) -> new WaterAvoidingRandomStrollGoal((PathfinderMob) mob, 1.0D));
-		this.add(2, (mob) -> new RandomLookAroundGoal(mob));
+		this.add(1, (mob) -> new UseItemGoal(mob, 2));
+		this.add(2, (mob) -> new SprintKeepDistanceToTargetGoal(mob, 0.5, 0.5, 3.0, 80));
+		this.add(3, (mob) -> new NearestTargetGoal(mob, true, true, MobGoalUtils.entityCategory(attackCategory)));
+		this.add(4, (mob) -> new WaterAvoidingRandomStrollGoal((PathfinderMob) mob, 1.0D));
+		this.add(5, (mob) -> new RandomLookAroundGoal(mob));
 
 		this.mainHandItem = mainHandItem;
 		this.offhandItem = offhandItem;
