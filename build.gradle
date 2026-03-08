@@ -181,12 +181,16 @@ dependencies {
     implementation fg.deobf("curse.maven:touhou-little-maid-${tlm_cf_id}:${tlm_cf_version_bin_file_id}-sources-${tlm_cf_version_src_file_id}")
     // tacz
     implementation fg.deobf("curse.maven:timeless-and-classics-zero-${tacz_cf_id}:${tacz_cf_version_bin_file_id}-sources-${tacz_cf_version_src_file_id}")
+    // sbw
+    implementation fg.deobf("curse.maven:superb-warfare-${sbw_cf_id}:${sbw_cf_version_bin_file_id}-sources-${sbw_cf_version_src_file_id}")
+    // curios
+    implementation fg.deobf("curse.maven:curios-${curios_cf_id}:${curios_cf_version_bin_file_id}-sources-${curios_cf_version_src_file_id}")
 }
 
 mixin {
     // MixinGradle Settings
-    add sourceSets.main, 'mixins.sc.server.refmap.json'
-    config 'sc.server.mixins.json'
+    add sourceSets.main, 'mixins.scba.refmap.json'
+    //config 'scba.mixins.json'
     
     debug.verbose = true
     debug.export = true 
