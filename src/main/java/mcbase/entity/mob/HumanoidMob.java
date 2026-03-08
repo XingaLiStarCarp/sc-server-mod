@@ -2,9 +2,9 @@ package mcbase.entity.mob;
 
 import java.util.List;
 
-import mcbase.entity.EntityData;
-import mcbase.entity.EntityRendererType;
 import mcbase.entity.EntityDefaultAttributes.Entry;
+import mcbase.entity.EntityRendererType;
+import mcbase.entity.SynchedEntityDataOp;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -48,7 +48,7 @@ public class HumanoidMob extends BaseMob {
 
 	public static final String TAG_SKIN = "skin";
 
-	public static final EntityDataAccessor<String> ACC_SKIN = EntityData.define(HumanoidMob.class, EntityDataSerializers.STRING, "");
+	public static final EntityDataAccessor<String> ACC_SKIN = SynchedEntityDataOp.define(HumanoidMob.class, EntityDataSerializers.STRING, "");
 
 	public HumanoidMob(EntityType<BaseMob> entityType, EntityRendererType<ResourceLocation> renderType, Level level) {
 		super(entityType, renderType, level);
@@ -69,7 +69,7 @@ public class HumanoidMob extends BaseMob {
 	public final ResourceLocation getSkin() {
 		if (skin == null) {
 			String storedSkin = entityData.get(ACC_SKIN);
-			if (EntityData.validate(storedSkin)) {
+			if (SynchedEntityDataOp.validate(storedSkin)) {
 				skin = ResourceLocation.parse(storedSkin);// 缓存
 			} else {
 				setSkin(this.defaultRenderAsset(ResourceLocation.class));
@@ -99,6 +99,6 @@ public class HumanoidMob extends BaseMob {
 
 	@Override
 	protected void loadData(CompoundTag compound, SynchedEntityData entityData) {
-		EntityData.loadString(compound, TAG_SKIN, entityData, ACC_SKIN);
+		SynchedEntityDataOp.loadString(compound, TAG_SKIN, entityData, ACC_SKIN);
 	}
 }

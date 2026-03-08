@@ -30,7 +30,7 @@ public class BlankEntity {
 	 */
 	public static final <_T extends Entity> _T allocate(Class<_T> entityClazz) {
 		_T entity = CapabilityData.construct(entityClazz, Entity.class);// 调用CapabilityProvider(Entity.class)初始化一个Entity对象
-		EntityData.setEntityData(entity, EntityData.newBasicEntityData(entity));
+		EntityData.setEntityData(entity, SynchedEntityDataOp.newBasicEntityData(entity));
 		try {
 			Entity_defineSynchedData.invokeExact(entity);
 		} catch (Throwable ex) {

@@ -17,15 +17,15 @@ import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 
 public class GuardTrait extends GoalTrait<BaseMob> {
 	public static final List<Entry> GUARD_ATTRIBUTES = List.of(
-			Entry.of(Attributes.MAX_HEALTH, 100),
+			Entry.of(Attributes.MAX_HEALTH, 20),
 			Entry.of(Attributes.MOVEMENT_SPEED, 0.2),
 			Entry.of(Attributes.FOLLOW_RANGE, 64),
 			Entry.of(Attributes.ARMOR, 20),
-			Entry.of(Attributes.ARMOR_TOUGHNESS, 10),
+			Entry.of(Attributes.ARMOR_TOUGHNESS, 8),
 			Entry.of(Attributes.KNOCKBACK_RESISTANCE, 0.8),
 			Entry.of(Attributes.ATTACK_DAMAGE, 10),
 			Entry.of(Attributes.ATTACK_KNOCKBACK, 1),
-			Entry.of(Attributes.ATTACK_SPEED, 5));
+			Entry.of(Attributes.ATTACK_SPEED, 1.5));
 
 	protected String mainHandItem;
 	protected String offhandItem;

@@ -26,6 +26,6 @@ public class MaidCustomer extends MaidMob {
 		this.addTrait(new GoalTrait<BaseMob>()
 				.add(1, (mob) -> new PanicGoal((PathfinderMob) mob, 1.25)));
 		this.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.SHIELD, 1));
+		this.startUsingItem(InteractionHand.OFF_HAND);
 	}
-
 }

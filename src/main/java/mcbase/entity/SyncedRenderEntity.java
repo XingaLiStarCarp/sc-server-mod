@@ -49,8 +49,10 @@ public interface SyncedRenderEntity<_RenderingEntity extends Entity, _Model> {
 	 * 该方法必须被子类调用以实时同步渲染模型，每tick调用一次即可。<br>
 	 */
 	public default _RenderingEntity syncRenderingEntity() {
+		Entity bindEntity = bindEntity();
 		_RenderingEntity renderingEntity = renderingEntity();
-		EntityData.copyData(bindEntity(), renderingEntity);
+		EntityData.copyData(bindEntity, renderingEntity);// 同步内存字段值
+		SynchedEntityDataOp.copyData(bindEntity.getEntityData(), renderingEntity.getEntityData());// 同步SynchedEntityData各项值
 		return renderingEntity;
 	}
 

@@ -7,9 +7,9 @@ import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleData
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleRegister;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 
-import mcbase.entity.EntityData;
 import mcbase.entity.EntityDefaultAttributes.Entry;
 import mcbase.entity.EntityRendererType;
+import mcbase.entity.SynchedEntityDataOp;
 import mcbase.entity.mob.BaseMob;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -54,24 +54,24 @@ public class MaidMob extends BaseMob implements SyncedRenderMaid {
 	/**
 	 * NBT储存数据
 	 */
-	public static final EntityDataAccessor<String> ST_TLM_MODEL_ID = EntityData.define(MaidMob.class, EntityDataSerializers.STRING, RENDERER_TYPE.defaultAsset().getTlmModelId());
-	public static final EntityDataAccessor<Boolean> ST_IS_YSM_MODEL = EntityData.define(MaidMob.class, EntityDataSerializers.BOOLEAN, RENDERER_TYPE.defaultAsset().isYsmModel());
-	public static final EntityDataAccessor<String> ST_YSM_MODEL_ID = EntityData.define(MaidMob.class, EntityDataSerializers.STRING, RENDERER_TYPE.defaultAsset().getYsmModelId());
-	public static final EntityDataAccessor<String> ST_YSM_MODEL_TEXTURE = EntityData.define(MaidMob.class, EntityDataSerializers.STRING, RENDERER_TYPE.defaultAsset().getYsmModelTexture());
-	public static final EntityDataAccessor<Component> ST_YSM_MODEL_NAME = EntityData.define(MaidMob.class, EntityDataSerializers.COMPONENT, RENDERER_TYPE.defaultAsset().getYsmModelName());
+	public static final EntityDataAccessor<String> ST_TLM_MODEL_ID = SynchedEntityDataOp.define(MaidMob.class, EntityDataSerializers.STRING, RENDERER_TYPE.defaultAsset().getTlmModelId());
+	public static final EntityDataAccessor<Boolean> ST_IS_YSM_MODEL = SynchedEntityDataOp.define(MaidMob.class, EntityDataSerializers.BOOLEAN, RENDERER_TYPE.defaultAsset().isYsmModel());
+	public static final EntityDataAccessor<String> ST_YSM_MODEL_ID = SynchedEntityDataOp.define(MaidMob.class, EntityDataSerializers.STRING, RENDERER_TYPE.defaultAsset().getYsmModelId());
+	public static final EntityDataAccessor<String> ST_YSM_MODEL_TEXTURE = SynchedEntityDataOp.define(MaidMob.class, EntityDataSerializers.STRING, RENDERER_TYPE.defaultAsset().getYsmModelTexture());
+	public static final EntityDataAccessor<Component> ST_YSM_MODEL_NAME = SynchedEntityDataOp.define(MaidMob.class, EntityDataSerializers.COMPONENT, RENDERER_TYPE.defaultAsset().getYsmModelName());
 
 	/**
 	 * YSM轮盘动画名称
 	 */
-	public static final EntityDataAccessor<String> RT_YSM_ANIMATION = EntityData.define(MaidMob.class, EntityDataSerializers.STRING, MaidModelAsset.DEFAULT_YSM_ANIMATION);
+	public static final EntityDataAccessor<String> RT_YSM_ANIMATION = SynchedEntityDataOp.define(MaidMob.class, EntityDataSerializers.STRING, MaidModelAsset.DEFAULT_YSM_ANIMATION);
 	/**
 	 * 是否播放YSM轮盘动画
 	 */
-	public static final EntityDataAccessor<Boolean> RT_YSM_ANIMATION_PLAYING = EntityData.define(MaidMob.class, EntityDataSerializers.BOOLEAN, false);
+	public static final EntityDataAccessor<Boolean> RT_YSM_ANIMATION_PLAYING = SynchedEntityDataOp.define(MaidMob.class, EntityDataSerializers.BOOLEAN, false);
 
-	public static final EntityDataAccessor<ChatBubbleDataCollection> RT_CHAT_BUBBLE = EntityData.define(MaidMob.class, ChatBubbleRegister.INSTANCE, ChatBubbleDataCollection.getEmptyCollection());
+	public static final EntityDataAccessor<ChatBubbleDataCollection> RT_CHAT_BUBBLE = SynchedEntityDataOp.define(MaidMob.class, ChatBubbleRegister.INSTANCE, ChatBubbleDataCollection.getEmptyCollection());
 
-	private EntityMaid renderingEntity;
+	protected final EntityMaid renderingEntity;
 
 	/**
 	 * 虚假女仆实体，不实际存在于游戏中，仅仅用于模型渲染
@@ -95,20 +95,20 @@ public class MaidMob extends BaseMob implements SyncedRenderMaid {
 
 	@Override
 	protected void loadData(CompoundTag compound, SynchedEntityData entityData) {
-		EntityData.loadString(compound, TAG_TLM_MODEL_ID, entityData, ST_TLM_MODEL_ID);
-		EntityData.loadBool(compound, TAG_IS_YSM_MODEL, entityData, ST_IS_YSM_MODEL);
-		EntityData.loadString(compound, TAG_YSM_MODEL_ID, entityData, ST_YSM_MODEL_ID);
-		EntityData.loadString(compound, TAG_YSM_MODEL_TEXTURE, entityData, ST_YSM_MODEL_TEXTURE);
-		EntityData.loadComponent(compound, TAG_YSM_MODEL_NAME, entityData, ST_YSM_MODEL_NAME);
+		SynchedEntityDataOp.loadString(compound, TAG_TLM_MODEL_ID, entityData, ST_TLM_MODEL_ID);
+		SynchedEntityDataOp.loadBool(compound, TAG_IS_YSM_MODEL, entityData, ST_IS_YSM_MODEL);
+		SynchedEntityDataOp.loadString(compound, TAG_YSM_MODEL_ID, entityData, ST_YSM_MODEL_ID);
+		SynchedEntityDataOp.loadString(compound, TAG_YSM_MODEL_TEXTURE, entityData, ST_YSM_MODEL_TEXTURE);
+		SynchedEntityDataOp.loadComponent(compound, TAG_YSM_MODEL_NAME, entityData, ST_YSM_MODEL_NAME);
 	}
 
 	@Override
 	protected void storeData(CompoundTag compound, SynchedEntityData entityData) {
-		EntityData.storeString(compound, TAG_TLM_MODEL_ID, entityData, ST_TLM_MODEL_ID);
-		EntityData.storeBool(compound, TAG_IS_YSM_MODEL, entityData, ST_IS_YSM_MODEL);
-		EntityData.storeString(compound, TAG_YSM_MODEL_ID, entityData, ST_YSM_MODEL_ID);
-		EntityData.storeString(compound, TAG_YSM_MODEL_TEXTURE, entityData, ST_YSM_MODEL_TEXTURE);
-		EntityData.storeComponent(compound, TAG_YSM_MODEL_NAME, entityData, ST_YSM_MODEL_NAME);
+		SynchedEntityDataOp.storeString(compound, TAG_TLM_MODEL_ID, entityData, ST_TLM_MODEL_ID);
+		SynchedEntityDataOp.storeBool(compound, TAG_IS_YSM_MODEL, entityData, ST_IS_YSM_MODEL);
+		SynchedEntityDataOp.storeString(compound, TAG_YSM_MODEL_ID, entityData, ST_YSM_MODEL_ID);
+		SynchedEntityDataOp.storeString(compound, TAG_YSM_MODEL_TEXTURE, entityData, ST_YSM_MODEL_TEXTURE);
+		SynchedEntityDataOp.storeComponent(compound, TAG_YSM_MODEL_NAME, entityData, ST_YSM_MODEL_NAME);
 	}
 
 	@Override

@@ -8,11 +8,11 @@ import java.util.List;
 import jvmsp.symbols;
 import mcbase.component.OpProvider;
 import mcbase.component.TraitProvider;
-import mcbase.entity.EntityData;
 import mcbase.entity.EntityDefaultAttributes;
+import mcbase.entity.EntityDefaultAttributes.Entry;
 import mcbase.entity.EntityInteractions;
 import mcbase.entity.EntityRendererType;
-import mcbase.entity.EntityDefaultAttributes.Entry;
+import mcbase.entity.SynchedEntityDataOp;
 import mcbase.registry.Registers;
 import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
 import net.minecraft.nbt.CompoundTag;
@@ -32,7 +32,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.registries.RegistryObject;
 import scba.ModEntry;
 
@@ -168,7 +167,7 @@ public abstract class BaseMob extends PathfinderMob implements TraitProvider<Bas
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
-		EntityData.defineAll(this);
+		SynchedEntityDataOp.defineAll(this);
 	}
 
 	/**

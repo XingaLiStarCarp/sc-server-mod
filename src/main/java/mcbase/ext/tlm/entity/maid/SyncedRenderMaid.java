@@ -296,6 +296,15 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 	public void setYsmModelName(Component ysmModelName);
 
 	/**
+	 * 更新roamingVars，YSM渲染使用
+	 * 
+	 * @param roamingVars
+	 */
+	public default void setRoamingVars(Object2FloatOpenHashMap<String> roamingVars) {
+		renderingEntity().roamingVars = roamingVars;
+	}
+
+	/**
 	 * 设置YSM模型
 	 * 
 	 * @param ysmModelId
@@ -303,6 +312,10 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 	 * @param ysmModelName
 	 */
 	public default void setYsmModel(String ysmModelId, String ysmModelTexture, Component ysmModelName) {
+		if (!ysmModelId.equals(this.getYsmModelId())) {
+			this.setRoamingVars(new Object2FloatOpenHashMap<>());
+			this.stopRouletteAnim();
+		}
 		setYsmModelId(ysmModelId);
 		setYsmModelTexture(ysmModelTexture);
 		setYsmModelName(ysmModelName);
