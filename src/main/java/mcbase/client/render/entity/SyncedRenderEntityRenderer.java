@@ -27,9 +27,9 @@ public abstract class SyncedRenderEntityRenderer<_RenderingEntity extends Entity
 		this.shadowStrength = EntityRenderers.getEntityRendererShadowStrength(syncEntityRenderer);// 设置实体脚下阴影的强度
 	}
 
-	public final void renderSyncEntity(_SyncEntity syncEntity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+	public final void renderSyncEntity(_SyncEntity syncEntity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		if (syncEntity != null) {
-			syncEntityRenderer.render(syncEntity.renderingEntity(), entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+			syncEntityRenderer.render(syncEntity.renderingEntity(), entityYaw, partialTick, poseStack, bufferSource, packedLight);
 		}
 	}
 
@@ -42,8 +42,8 @@ public abstract class SyncedRenderEntityRenderer<_RenderingEntity extends Entity
 	public abstract _SyncEntity dispatch(Entity entity);
 
 	@Override
-	public void render(Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-		this.renderSyncEntity(this.dispatch(entity), entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+	public void render(Entity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		this.renderSyncEntity(this.dispatch(entity), entityYaw, partialTick, poseStack, bufferSource, packedLight);
 	}
 
 	@Override

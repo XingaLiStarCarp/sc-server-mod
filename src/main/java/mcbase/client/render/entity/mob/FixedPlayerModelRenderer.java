@@ -1,6 +1,7 @@
 package mcbase.client.render.entity.mob;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.model.HumanoidArmorModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -16,15 +17,18 @@ import net.minecraft.client.renderer.entity.layers.ElytraLayer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
 import net.minecraft.client.renderer.entity.layers.SpinAttackEffectLayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.phys.Vec3;
 
 /**
- * 使用固定一种体型的玩家模型的实体渲染器
+ * 使用固定一种体型的玩家模型的实体渲染器。<br>
+ * 参考自net.minecraft.client.renderer.entity.player.PlayerRenderer。<br>
  * 
  * @param <_T>
  */
@@ -134,6 +138,60 @@ public abstract class FixedPlayerModelRenderer<_T extends LivingEntity> extends 
 	}
 
 	/**
+	 * 位矢增量线性插值，客户端渲染频率远高于服务端的逻辑更新的20Hz。<br>
+	 * 需要插值做平滑过渡处理。<br>
+	 * 
+	 * @param entity
+	 * @param partialTick
+	 * @return
+	 */
+	public Vec3 getDeltaMovementLerped(_T entity, float partialTick) {
+		return entity.getDeltaMovement().lerp(entity.getDeltaMovement(), (double) partialTick);
+	}
+
+	/**
+	 * 动画的肢体旋转变换.<br>
+	 * 如果没有此方法则肢体动画（包括部分Pose，例如游泳姿态）会出现渲染错位。<br>
+	 * 
+	 * @param entity
+	 * @param poseStack
+	 * @param bob
+	 * @param yBodyRot
+	 * @param partialTick
+	 */
+	@Override
+	protected void setupRotations(_T entity, PoseStack poseStack, float bob, float yBodyRot, float partialTick) {
+		float swimPoseInterploteFactor = entity.getSwimAmount(partialTick);
+		if (entity.isFallFlying()) {
+			super.setupRotations(entity, poseStack, bob, yBodyRot, partialTick);
+			float interplotedFallFlyingTick = (float) entity.getFallFlyingTicks() + partialTick;
+			float rotationFactor = Mth.clamp(interplotedFallFlyingTick * interplotedFallFlyingTick / 100.0f, 0.0f, 1.0f);
+			if (!entity.isAutoSpinAttack()) {// 三叉戟飞行旋转攻击动画
+				poseStack.mulPose(Axis.XP.rotationDegrees(rotationFactor * (-90.0f - entity.getXRot())));
+			}
+			Vec3 viewDirection = entity.getViewVector(partialTick);
+			Vec3 dx = getDeltaMovementLerped(entity, partialTick);
+			double dxHorizontalSqr = dx.horizontalDistanceSqr();
+			double viewDirectionHorizontalSqr = viewDirection.horizontalDistanceSqr();
+			if (dxHorizontalSqr > 0.0 && viewDirectionHorizontalSqr > 0.0) {
+				double d2 = (dx.x * viewDirection.x + dx.z * viewDirection.z) / Math.sqrt(dxHorizontalSqr * viewDirectionHorizontalSqr);
+				double d3 = dx.x * viewDirection.z - dx.z * viewDirection.x;
+				poseStack.mulPose(Axis.YP.rotation((float) (Math.signum(d3) * Math.acos(d2))));
+			}
+		} else if (swimPoseInterploteFactor > 0.0f) {
+			super.setupRotations(entity, poseStack, bob, yBodyRot, partialTick);
+			float swimPoseMaxFactor = entity.isInWater() || entity.isInFluidType((fluidType, height) -> entity.canSwimInFluidType(fluidType)) ? -90.0f - entity.getXRot() : -90.0f;
+			float swimPoseInterploted = Mth.lerp(swimPoseInterploteFactor, 0.0f, swimPoseMaxFactor);
+			poseStack.mulPose(Axis.XP.rotationDegrees(swimPoseInterploted));
+			if (entity.isVisuallySwimming()) {
+				poseStack.translate(0.0f, -1.0f, 0.3f);
+			}
+		} else {
+			super.setupRotations(entity, poseStack, bob, yBodyRot, partialTick);
+		}
+	}
+
+	/**
 	 * 是否渲染名字。<br>
 	 * 采用MobRenderer同款判定。<br>
 	 */
@@ -142,8 +200,8 @@ public abstract class FixedPlayerModelRenderer<_T extends LivingEntity> extends 
 	}
 
 	@Override
-	public void render(_T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+	public void render(_T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		this.setModelProperties(entity);
-		super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+		super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 	}
 }

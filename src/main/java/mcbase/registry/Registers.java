@@ -11,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -105,5 +106,9 @@ public class Registers {
 
 	public static final Item item(String type) {
 		return ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(type));
+	}
+
+	public static final ItemStack itemStack(String type) {
+		return item(type).getDefaultInstance();
 	}
 }

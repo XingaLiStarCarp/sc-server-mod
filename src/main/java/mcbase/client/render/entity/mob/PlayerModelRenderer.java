@@ -44,10 +44,10 @@ public abstract class PlayerModelRenderer<_T extends LivingEntity> extends Entit
 	protected abstract boolean isSlim(_T entity);
 
 	@Override
-	public void render(_T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+	public void render(_T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		if (this.isSlim(entity))
-			slimRenderer.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+			slimRenderer.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 		else
-			wideRenderer.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+			wideRenderer.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 	}
 }

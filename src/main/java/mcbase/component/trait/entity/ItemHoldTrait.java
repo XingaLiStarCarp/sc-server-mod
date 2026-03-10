@@ -15,8 +15,8 @@ import net.minecraft.world.item.Items;
 public class ItemHoldTrait implements TraitComponent<LivingEntity> {
 	private LivingEntity entity;
 
-	private String mainHandItem;
-	private String offhandItem;
+	private ItemStack mainHandItem;
+	private ItemStack offhandItem;
 
 	private ItemStack originalMainHandItem;
 	private ItemStack originalOffHandItem;
@@ -24,15 +24,24 @@ public class ItemHoldTrait implements TraitComponent<LivingEntity> {
 	/**
 	 * 空物品的ID
 	 */
-	public static final String EMPTY = Items.AIR.toString();
+	public static final String EMPTY_ID = Items.AIR.toString();
+	public static final ItemStack EMPTY_ITEM = ItemStack.EMPTY;
 
-	public ItemHoldTrait(String mainHandItem, String offhandItem) {
+	public ItemHoldTrait(ItemStack mainHandItem, ItemStack offhandItem) {
 		this.mainHandItem = mainHandItem;
 		this.offhandItem = offhandItem;
 	}
 
+	public ItemHoldTrait(ItemStack mainHandItem) {
+		this(mainHandItem, EMPTY_ITEM);
+	}
+
+	public ItemHoldTrait(String mainHandItem, String offhandItem) {
+		this(Registers.itemStack(mainHandItem), Registers.itemStack(offhandItem));
+	}
+
 	public ItemHoldTrait(String mainHandItem) {
-		this(mainHandItem, EMPTY);
+		this(mainHandItem, EMPTY_ID);
 	}
 
 	public ItemStack getMainHandItem() {
@@ -49,18 +58,26 @@ public class ItemHoldTrait implements TraitComponent<LivingEntity> {
 		return null;
 	}
 
-	public void setMainHandItem(String mainHandItem) {
+	public void setMainHandItem(ItemStack mainHandItem) {
 		this.mainHandItem = mainHandItem;
 		if (this.entity != null) {
-			this.entity.setItemInHand(InteractionHand.MAIN_HAND, Registers.item(mainHandItem).getDefaultInstance());
+			this.entity.setItemInHand(InteractionHand.MAIN_HAND, mainHandItem);
+		}
+	}
+
+	public void setMainHandItem(String mainHandItem) {
+		setMainHandItem(Registers.itemStack(mainHandItem));
+	}
+
+	public void setOffHandItem(ItemStack offhandItem) {
+		this.offhandItem = offhandItem;
+		if (this.entity != null) {
+			this.entity.setItemInHand(InteractionHand.OFF_HAND, offhandItem);
 		}
 	}
 
 	public void setOffHandItem(String offhandItem) {
-		this.offhandItem = offhandItem;
-		if (this.entity != null) {
-			this.entity.setItemInHand(InteractionHand.OFF_HAND, Registers.item(offhandItem).getDefaultInstance());
-		}
+		setMainHandItem(Registers.itemStack(offhandItem));
 	}
 
 	@Override
