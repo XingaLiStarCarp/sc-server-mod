@@ -6,11 +6,14 @@ import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 
 import mcbase.entity.EntityRendererType;
 import mcbase.entity.Humanoid.HumanoidEntity;
+import mcbase.entity.Humanoid.PlayerModelAsset;
 import mcbase.entity.data.SynchedEntityDataOp;
 import mcbase.entity.mob.BaseMob;
 import mcbase.entity.mob.HumanoidMob;
+import mcbase.entity.mob.ProxyRenderPlayer.ProxyRenderPlayerEntity;
 import mcbase.extended.tlm.entity.maid.MaidMob;
-import mcbase.extended.tlm.entity.maid.SyncedRenderMaid.SyncedRenderMaidEntity;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid.MaidModelAsset;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid.ProxyRenderMaidEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -20,13 +23,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.RegistryObject;
 
 /**
- * 通用人型实体，支持TLM、YSM和原版玩家模型
+ * 通用人型实体，支持TLM、YSM和玩家模型
  */
-public class GeneralHumanoidMob extends BaseMob implements HumanoidEntity, SyncedRenderMaidEntity {
+public class GeneralHumanoidMob extends BaseMob {
 
 	public static class GeneralHumanoidModelInfo {
 		public static final int TYPE_PLAYER = 0;
@@ -75,40 +79,111 @@ public class GeneralHumanoidMob extends BaseMob implements HumanoidEntity, Synce
 	 */
 	public static final EntityDataAccessor<?>[] PLAYER_ACCS = HumanoidEntity.defineAllHumanoidEntityData(GeneralHumanoidMob.class);
 
+	private class ProxyPlayer implements ProxyRenderPlayerEntity {
+
+		protected ResourceLocation skin = HumanoidMob.RENDERER_TYPE.defaultAsset().getSkin();
+
+		@Override
+		@SuppressWarnings("rawtypes")
+		public EntityDataAccessor[] humanoidEntityDataAccs() {
+			return PLAYER_ACCS;
+		}
+
+		public ProxyPlayer() {
+			this.renderingEntity = this.blankRenderingEntity(GeneralHumanoidMob.this);
+		}
+
+		protected final Player renderingEntity;
+
+		@Override
+		public final Player renderingEntity() {
+			return renderingEntity;
+		}
+
+		@Override
+		public final Entity bindEntity() {
+			return GeneralHumanoidMob.this;
+		}
+
+		@Override
+		public PlayerModelAsset modelAsset() {
+			return new PlayerModelAsset(skin, this.isSlim());
+		}
+
+		@Override
+		public ResourceLocation getSkin() {
+			return skin;
+		}
+
+		@Override
+		public void updateSkin(String skinId) {
+			this.skin = ResourceLocation.parse(skinId);
+		}
+	};
+
 	/**
 	 * 女仆数据
 	 */
-	public static final EntityDataAccessor<?>[] MAID_ACCS = SyncedRenderMaidEntity.defineAllMaidEntityData(GeneralHumanoidMob.class);
+	public static final EntityDataAccessor<?>[] MAID_ACCS = ProxyRenderMaidEntity.defineAllMaidEntityData(GeneralHumanoidMob.class);
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public EntityDataAccessor[] maidEntityDataAccs() {
-		return MAID_ACCS;
+	private class ProxyMaid implements ProxyRenderMaidEntity {
+
+		@Override
+		@SuppressWarnings("rawtypes")
+		public EntityDataAccessor[] maidEntityDataAccs() {
+			return MAID_ACCS;
+		}
+
+		protected final EntityMaid renderingEntity;
+
+		public ProxyMaid() {
+			this.renderingEntity = this.blankRenderingEntity(GeneralHumanoidMob.this);
+		}
+
+		@Override
+		public boolean isSwingingArms() {
+			return GeneralHumanoidMob.this.swinging;
+		}
+
+		@Override
+		public EntityMaid renderingEntity() {
+			return renderingEntity;
+		}
+
+		@Override
+		public Entity bindEntity() {
+			return GeneralHumanoidMob.this;
+		}
 	}
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public EntityDataAccessor[] humanoidEntityDataAccs() {
-		return PLAYER_ACCS;
+	/**
+	 * 玩家虚假实体
+	 */
+	@Deprecated
+	private ProxyPlayer proxyPlayer;
+
+	/**
+	 * proxyPlayer必须使用此方法获取。<br>
+	 * 否则实体在实例化时，父类构造函数会触发onSyncedDataUpdated()导致proxyPlayer还未初始化就被访问。
+	 * 
+	 * @return
+	 */
+	public final ProxyRenderPlayerEntity proxyRenderPlayer() {
+		return proxyPlayer == null ? (this.proxyPlayer = this.new ProxyPlayer()) : proxyPlayer;
 	}
 
-	protected final EntityMaid renderingEntity;
+	/**
+	 * 女仆虚假实体
+	 */
+	@Deprecated
+	private ProxyMaid proxyMaid;
 
-	@Override
-	public final EntityMaid renderingEntity() {
-		return renderingEntity;
+	public final ProxyRenderMaidEntity proxyRenderMaid() {
+		return proxyMaid == null ? (this.proxyMaid = this.new ProxyMaid()) : proxyMaid;
 	}
-
-	@Override
-	public final Entity bindEntity() {
-		return this;
-	}
-
-	protected ResourceLocation skin = HumanoidMob.RENDERER_TYPE.defaultAsset().getSkin();
 
 	public GeneralHumanoidMob(EntityType<BaseMob> entityType, EntityRendererType<GeneralHumanoidModelInfo> renderType, Level level) {
 		super(entityType, renderType, level);
-		renderingEntity = this.blankRenderingEntity(this);
 	}
 
 	public int getRenderType() {
@@ -122,29 +197,33 @@ public class GeneralHumanoidMob extends BaseMob implements HumanoidEntity, Synce
 	@Override
 	protected void loadData(CompoundTag compound, SynchedEntityData entityData) {
 		SynchedEntityDataOp.loadInt(compound, TAG_RENDER_TYPE, entityData, ST_RENDER_TYPE);
-		this.loadAllHumanoidEntityData(compound, entityData);
-		this.loadAllMaidEntityData(compound, entityData);
+		proxyRenderPlayer().loadAllHumanoidEntityData(compound, entityData);
+		proxyRenderMaid().loadAllMaidEntityData(compound, entityData);
 	}
 
 	@Override
 	protected void storeData(CompoundTag compound, SynchedEntityData entityData) {
 		SynchedEntityDataOp.storeInt(compound, TAG_RENDER_TYPE, entityData, ST_RENDER_TYPE);
-		this.storeAllHumanoidEntityData(compound, entityData);
-		this.storeAllMaidEntityData(compound, entityData);
+		proxyRenderPlayer().storeAllHumanoidEntityData(compound, entityData);
+		proxyRenderMaid().storeAllMaidEntityData(compound, entityData);
 	}
 
 	@Override
 	public void onSyncedDataUpdated(EntityDataAccessor<?> acc) {
 		super.onSyncedDataUpdated(acc);
-		this.onHumanoidEntitySyncedDataUpdated(acc);
+		proxyRenderPlayer().onHumanoidEntitySyncedDataUpdated(acc);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
 		switch (this.getRenderType()) {
+		case GeneralHumanoidModelInfo.TYPE_PLAYER: {
+			proxyRenderPlayer().syncRenderingEntity();
+			break;
+		}
 		case GeneralHumanoidModelInfo.TYPE_MAID: {
-			this.syncRenderingEntity();
+			proxyRenderMaid().syncRenderingEntity();
 			break;
 		}
 		}
@@ -154,26 +233,14 @@ public class GeneralHumanoidMob extends BaseMob implements HumanoidEntity, Synce
 	public void rideTick() {
 		super.rideTick();
 		switch (this.getRenderType()) {
+		case GeneralHumanoidModelInfo.TYPE_PLAYER: {
+			break;
+		}
 		case GeneralHumanoidModelInfo.TYPE_MAID: {
-			this.tickMaidRide();
+			proxyRenderMaid().tickMaidRide();
 			break;
 		}
 		}
-	}
-
-	@Override
-	public ResourceLocation getSkin() {
-		return skin;
-	}
-
-	@Override
-	public boolean isSwingingArms() {
-		return this.swinging;
-	}
-
-	@Override
-	public void updateSkin(String skinId) {
-		this.skin = ResourceLocation.parse(skinId);
 	}
 
 }

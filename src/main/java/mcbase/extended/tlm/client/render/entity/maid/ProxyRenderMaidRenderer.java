@@ -2,7 +2,7 @@ package mcbase.extended.tlm.client.render.entity.maid;
 
 import mcbase.client.render.entity.EntityRenderers;
 import mcbase.extended.tlm.entity.maid.MaidMob;
-import mcbase.extended.tlm.entity.maid.SyncedRenderMaid;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,18 +15,18 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
  * MaidMob渲染器
  */
 @EventBusSubscriber(value = Dist.CLIENT, bus = Bus.MOD)
-public class MaidRenderer extends SyncedRenderMaidRenderer {
+public class ProxyRenderMaidRenderer extends GeneralProxyRenderMaidRenderer {
 	static {
-		MaidMob.RENDERER_TYPE.registerRenderer(MaidRenderer.class, EntityRendererProvider.Context.class);
+		MaidMob.RENDERER_TYPE.registerRenderer(ProxyRenderMaidRenderer.class, EntityRendererProvider.Context.class);
 	}
 
-	public MaidRenderer(EntityRendererProvider.Context context) {
+	public ProxyRenderMaidRenderer(EntityRendererProvider.Context context) {
 		super(context);
 	}
 
 	@Override
-	public SyncedRenderMaid dispatch(Entity entity) {
-		if (entity instanceof SyncedRenderMaid maid)
+	protected ProxyRenderMaid dispatchProxyEntity(Entity entity) {
+		if (entity instanceof ProxyRenderMaid maid)
 			return maid;
 		else
 			return null;

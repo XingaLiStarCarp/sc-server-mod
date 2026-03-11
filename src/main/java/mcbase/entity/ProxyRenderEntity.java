@@ -8,8 +8,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import mcbase.LogicalEnd;
 import mcbase.entity.data.EntityData;
-import mcbase.entity.data.SynchedEntityDataOp;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
@@ -20,7 +21,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 /**
  * 渲染位姿同步的虚假实体
  */
-public interface SyncedRenderEntity<_RenderingEntity extends Entity, _Model> {
+public interface ProxyRenderEntity<_RenderingEntity extends Entity, _Model> {
 	/**
 	 * 获取渲染的虚假实体。<br>
 	 * 该虚假实体需要通过blankRenderingEntity()方法创建。<br>
@@ -35,6 +36,16 @@ public interface SyncedRenderEntity<_RenderingEntity extends Entity, _Model> {
 	 * @return
 	 */
 	public abstract Entity bindEntity();
+
+	/**
+	 * 获取实体数据<br>
+	 * 如果一个继承自Entity的类实现了此接口，则可以直接使用Entity::getEntityData()。<br>
+	 * 
+	 * @return
+	 */
+	public default SynchedEntityData getEntityData() {
+		return bindEntity().getEntityData();
+	}
 
 	/**
 	 * 该渲染模型绑定的实体是否被移除，被移除的实体不能再同步数据。<br>
@@ -52,7 +63,7 @@ public interface SyncedRenderEntity<_RenderingEntity extends Entity, _Model> {
 	 */
 	public default void syncRenderingEntity() {
 		// 仅客户端同步
-		if (bindEntity().level().isClientSide()) {
+		if (LogicalEnd.isClient()) {
 			this.syncRenderingEntityData();
 		}
 	}
@@ -60,8 +71,7 @@ public interface SyncedRenderEntity<_RenderingEntity extends Entity, _Model> {
 	public default _RenderingEntity syncRenderingEntityData() {
 		Entity bindEntity = bindEntity();
 		_RenderingEntity renderingEntity = renderingEntity();
-		EntityData.copyData(bindEntity, renderingEntity);// 同步内存字段值
-		SynchedEntityDataOp.copyData(bindEntity.getEntityData(), renderingEntity.getEntityData());// 同步SynchedEntityData各项值
+		EntityData.syncEntityData(bindEntity, renderingEntity);// 同步内存字段值
 		return renderingEntity;
 	}
 
@@ -94,7 +104,7 @@ public interface SyncedRenderEntity<_RenderingEntity extends Entity, _Model> {
 	 * 绑定实体的渲染模型
 	 */
 	@EventBusSubscriber(value = Dist.CLIENT, bus = Bus.FORGE)
-	public static abstract class ModelBinder<_RenderingEntity extends Entity, _Model> implements SyncedRenderEntity<_RenderingEntity, _Model> {
+	public static abstract class ModelBinder<_RenderingEntity extends Entity, _Model> implements ProxyRenderEntity<_RenderingEntity, _Model> {
 		protected final Entity bindEntity;
 		protected final _Model model;
 

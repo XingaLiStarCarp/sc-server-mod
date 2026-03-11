@@ -25,12 +25,12 @@ import javabase.HashFunctions;
 import jvmsp.reflection;
 import jvmsp.unsafe;
 import mcbase.ModPaths;
-import mcbase.entity.SyncedRenderEntity;
+import mcbase.entity.ProxyRenderEntity;
 import mcbase.entity.data.BlankEntity;
 import mcbase.entity.data.EntityData;
 import mcbase.entity.data.SynchedEntityDataOp;
 import mcbase.entity.data.SynchedEntityDataOp.DataEntry;
-import mcbase.extended.tlm.entity.maid.SyncedRenderMaid.MaidModelAsset;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid.MaidModelAsset;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -49,7 +49,7 @@ import scba.ModEntry;
  * 可以作为Touhou Little Maid模组女仆模型渲染的委托接口。<br>
  * 支持YSM模型渲染。<br>
  */
-public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidModelAsset> {
+public interface ProxyRenderMaid extends ProxyRenderEntity<EntityMaid, MaidModelAsset> {
 	public static final float MIAD_WIDTH = 0.6f;
 	public static final float MAID_HEIGHT = 1.8f;
 
@@ -351,7 +351,7 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 	 */
 	@Override
 	public default EntityMaid syncRenderingEntityData() {
-		EntityMaid renderingEntity = SyncedRenderEntity.super.syncRenderingEntityData();
+		EntityMaid renderingEntity = ProxyRenderEntity.super.syncRenderingEntityData();
 		// 同步模型
 		renderingEntity.setModelId(this.getTlmModelId());
 		renderingEntity.setIsYsmModel(this.isYsmModel());
@@ -402,7 +402,7 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 		renderingEntity().stopRouletteAnim();
 	}
 
-	public static SyncedRenderMaid bind(Entity bindEntity, MaidModelAsset model) {
+	public static ProxyRenderMaid bind(Entity bindEntity, MaidModelAsset model) {
 		return Binder.bind(bindEntity, model);
 	}
 
@@ -412,7 +412,7 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 	 * @param bindEntity
 	 * @return
 	 */
-	public static SyncedRenderMaid bind(Entity bindEntity, BiConsumer<Entity, MaidModelAsset> modelResolver) {
+	public static ProxyRenderMaid bind(Entity bindEntity, BiConsumer<Entity, MaidModelAsset> modelResolver) {
 		return Binder.bind(bindEntity, modelResolver);
 	}
 
@@ -420,14 +420,14 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 	 * 绑定实体的女仆模型
 	 */
 	@EventBusSubscriber(value = Dist.CLIENT, bus = Bus.FORGE)
-	public static class Binder extends ModelBinder<EntityMaid, MaidModelAsset> implements SyncedRenderMaid {
+	public static class Binder extends ModelBinder<EntityMaid, MaidModelAsset> implements ProxyRenderMaid {
 
-		public static final SyncedRenderMaid bind(Entity bindEntity, MaidModelAsset model) {
-			return bind(SyncedRenderMaid.Binder::new, bindEntity, model);
+		public static final ProxyRenderMaid bind(Entity bindEntity, MaidModelAsset model) {
+			return bind(ProxyRenderMaid.Binder::new, bindEntity, model);
 		}
 
-		public static final SyncedRenderMaid bind(Entity bindEntity, BiConsumer<Entity, MaidModelAsset> modelResolver) {
-			return bind(bindEntity, MaidModelAsset::new, modelResolver, SyncedRenderMaid.Binder::new);
+		public static final ProxyRenderMaid bind(Entity bindEntity, BiConsumer<Entity, MaidModelAsset> modelResolver) {
+			return bind(bindEntity, MaidModelAsset::new, modelResolver, ProxyRenderMaid.Binder::new);
 		}
 
 		protected Binder(Entity bindEntity, MaidModelAsset model) {
@@ -524,7 +524,7 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 	 * 继承自Entity的类需要实现的接口
 	 */
 	@SuppressWarnings("unchecked")
-	public static interface SyncedRenderMaidEntity extends SyncedRenderMaid {
+	public static interface ProxyRenderMaidEntity extends ProxyRenderMaid {
 
 		public static final String TAG_TLM_MODEL_ID = "tlm_model_id";
 		public static final String TAG_IS_YSM_MODEL = "is_ysm_model";
@@ -579,11 +579,6 @@ public interface SyncedRenderMaid extends SyncedRenderEntity<EntityMaid, MaidMod
 			SynchedEntityDataOp.storeString(compound, TAG_YSM_ANIMATION, entityData, maidEntityDataAccs()[IDX_YSM_ANIMATION]);
 			SynchedEntityDataOp.storeBool(compound, TAG_YSM_ANIMATION_PLAYING, entityData, maidEntityDataAccs()[IDX_YSM_ANIMATION_PLAYING]);
 		}
-
-		/**
-		 * 继承Entity类自动实现
-		 */
-		public abstract SynchedEntityData getEntityData();
 
 		/**
 		 * 高频调用，必须返回defineAllEntityData()得到的static数组

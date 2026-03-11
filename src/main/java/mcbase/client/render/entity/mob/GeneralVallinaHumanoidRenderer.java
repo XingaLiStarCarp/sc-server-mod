@@ -14,15 +14,16 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
 /**
- * 渲染实现了Humanoid接口的实体
+ * 渲染实现了Humanoid接口的实体。<br>
+ * 使用了原版的PlayerRenderer的渲染策略，如果PlayerRenderer被Mixin注入了新功能，此渲染器不会受影响。<br>
  * 
  * @param <_T>
  */
 @OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(value = Dist.CLIENT, bus = Bus.MOD)
-public class HumanoidRenderer<_T extends LivingEntity & Humanoid> extends PlayerModelRenderer<_T> {
+public class GeneralVallinaHumanoidRenderer<_T extends LivingEntity & Humanoid> extends GeneralVallinaPlayerModelRenderer<_T> {
 
-	public HumanoidRenderer(EntityRendererProvider.Context context) {
+	public GeneralVallinaHumanoidRenderer(EntityRendererProvider.Context context) {
 		super(context);
 	}
 
@@ -37,7 +38,7 @@ public class HumanoidRenderer<_T extends LivingEntity & Humanoid> extends Player
 	}
 
 	static {
-		HumanoidMob.RENDERER_TYPE.registerRenderer(HumanoidRenderer.class, EntityRendererProvider.Context.class);
+		HumanoidMob.RENDERER_TYPE.registerRenderer(GeneralVallinaHumanoidRenderer.class, EntityRendererProvider.Context.class);
 	}
 
 	@SubscribeEvent

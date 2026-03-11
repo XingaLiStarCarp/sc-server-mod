@@ -6,21 +6,21 @@ import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.IGeoEntity;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.IGeoEntityRenderer;
 
 import jvmsp.unsafe;
-import mcbase.client.render.entity.SyncedRenderEntityRenderer;
-import mcbase.extended.tlm.entity.maid.SyncedRenderMaid;
+import mcbase.client.render.entity.ProxyRenderEntityRenderer;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.Mob;
 
 /**
  * Touhou Little Maid模组的实体渲染。<br>
  */
-public abstract class SyncedRenderMaidRenderer extends SyncedRenderEntityRenderer<EntityMaid, SyncedRenderMaid> {
+public abstract class GeneralProxyRenderMaidRenderer extends ProxyRenderEntityRenderer<ProxyRenderMaid, EntityMaidRenderer> {
 	protected final IGeoEntityRenderer<Mob> ysmMaidRenderer;
 
 	@SuppressWarnings("unchecked")
-	public SyncedRenderMaidRenderer(EntityRendererProvider.Context context) {
+	public GeneralProxyRenderMaidRenderer(EntityRendererProvider.Context context) {
 		super(context, new EntityMaidRenderer(context));
-		ysmMaidRenderer = (IGeoEntityRenderer<Mob>) unsafe.read_member_reference(this.syncEntityRenderer, "ysmMaidRenderer");
+		ysmMaidRenderer = (IGeoEntityRenderer<Mob>) unsafe.read_member_reference(this.proxyEntityRenderer, "ysmMaidRenderer");
 	}
 
 	/**

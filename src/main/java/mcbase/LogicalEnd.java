@@ -1,6 +1,7 @@
 package mcbase;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
@@ -37,21 +38,31 @@ public enum LogicalEnd {
 		return FMLEnvironment.dist == Dist.CLIENT;
 	}
 
+	public static final Level clientLevel() {
+		if (isClient()) {
+			Minecraft mc = Minecraft.getInstance();
+			if (mc != null)
+				return mc.level;
+		}
+		return null;
+	}
+
 	/**
 	 * 判断当前运行环境
 	 * 
 	 * @return
 	 */
 	public static LogicalEnd host() {
-		Minecraft mc;
-		if (FMLEnvironment.dist == Dist.CLIENT && (mc = Minecraft.getInstance()) != null) {
-			if (mc.isLocalServer())
-				return LOCAL_SERVER;
-			else
-				return PURE_CLIENT;
-		} else {
-			return PURE_SERVER;
+		if (isClient()) {
+			Minecraft mc = Minecraft.getInstance();
+			if (mc != null) {
+				if (mc.isLocalServer())
+					return LOCAL_SERVER;
+				else
+					return PURE_CLIENT;
+			}
 		}
+		return PURE_SERVER;
 	}
 
 	public static boolean isHostPureClient() {

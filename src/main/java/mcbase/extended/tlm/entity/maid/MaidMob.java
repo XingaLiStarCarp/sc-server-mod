@@ -6,7 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 
 import mcbase.entity.EntityRendererType;
 import mcbase.entity.mob.BaseMob;
-import mcbase.extended.tlm.entity.maid.SyncedRenderMaid.SyncedRenderMaidEntity;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid.ProxyRenderMaidEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -20,7 +20,7 @@ import net.minecraftforge.registries.RegistryObject;
 /**
  * Touhou Little Maid模组的女仆类型实体，需要配合渲染器EntityMaidRenderer使用
  */
-public class MaidMob extends BaseMob implements SyncedRenderMaidEntity {
+public class MaidMob extends BaseMob implements ProxyRenderMaidEntity {
 
 	public static final EntityRendererType<MaidModelAsset> RENDERER_TYPE = new EntityRendererType<>();
 
@@ -36,7 +36,7 @@ public class MaidMob extends BaseMob implements SyncedRenderMaidEntity {
 		RENDERER_TYPE.setDefaultRenderAsset(MaidModelAsset.DEFAULT);
 	}
 
-	private static final EntityDataAccessor<?>[] ACCS = SyncedRenderMaidEntity.defineAllMaidEntityData(MaidMob.class);
+	private static final EntityDataAccessor<?>[] ACCS = ProxyRenderMaidEntity.defineAllMaidEntityData(MaidMob.class);
 
 	@Override
 	public EntityDataAccessor<?>[] maidEntityDataAccs() {

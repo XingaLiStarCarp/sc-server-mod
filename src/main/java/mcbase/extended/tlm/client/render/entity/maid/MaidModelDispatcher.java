@@ -3,8 +3,8 @@ package mcbase.extended.tlm.client.render.entity.maid;
 import java.util.function.BiConsumer;
 
 import mcbase.client.render.entity.EntityRenderers;
-import mcbase.extended.tlm.entity.maid.SyncedRenderMaid;
-import mcbase.extended.tlm.entity.maid.SyncedRenderMaid.MaidModelAsset;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid.MaidModelAsset;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -12,7 +12,7 @@ import net.minecraft.world.entity.EntityType;
 /**
  * 将指定EntityType渲染为指定TLM或YSM模型的渲染器
  */
-public class MaidModelDispatcher extends SyncedRenderMaidRenderer {
+public class MaidModelDispatcher extends GeneralProxyRenderMaidRenderer {
 	private BiConsumer<Entity, MaidModelAsset> modelResolver;
 
 	public MaidModelDispatcher(EntityRendererProvider.Context context, BiConsumer<Entity, MaidModelAsset> modelResolver) {
@@ -25,8 +25,8 @@ public class MaidModelDispatcher extends SyncedRenderMaidRenderer {
 	}
 
 	@Override
-	public SyncedRenderMaid dispatch(Entity entity) {
-		SyncedRenderMaid maid = SyncedRenderMaid.bind(entity, modelResolver);
+	protected ProxyRenderMaid dispatchProxyEntity(Entity entity) {
+		ProxyRenderMaid maid = ProxyRenderMaid.bind(entity, modelResolver);
 		modelResolver.accept(entity, maid.modelAsset());// 执行更新，每tick同步一次数据
 		return maid;
 	}

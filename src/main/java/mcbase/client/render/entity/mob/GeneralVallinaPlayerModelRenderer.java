@@ -10,26 +10,27 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
- * 综合男女两种体型的使用玩家模型的实体渲染器
+ * 综合男女两种体型的使用玩家模型的实体渲染器。<br>
+ * 原版渲染器，如果有mod对PlayerRenderer使用了Mixin注入，将不会影响到此方法。
  * 
  * @param <_T>
  */
-public abstract class PlayerModelRenderer<_T extends LivingEntity> extends EntityRenderer<_T> {
-	private class ModelRenderer extends FixedPlayerModelRenderer<_T> {
+public abstract class GeneralVallinaPlayerModelRenderer<_T extends LivingEntity> extends EntityRenderer<_T> {
+	private class ModelRenderer extends VallinaPlayerModelRenderer<_T> {
 		public ModelRenderer(Context context, boolean slim) {
 			super(context, slim);
 		}
 
 		@Override
 		public ResourceLocation getTextureLocation(_T entity) {
-			return PlayerModelRenderer.this.getTextureLocation(entity);
+			return GeneralVallinaPlayerModelRenderer.this.getTextureLocation(entity);
 		}
 	}
 
-	private FixedPlayerModelRenderer<_T> wideRenderer;
-	private FixedPlayerModelRenderer<_T> slimRenderer;
+	private VallinaPlayerModelRenderer<_T> wideRenderer;
+	private VallinaPlayerModelRenderer<_T> slimRenderer;
 
-	public PlayerModelRenderer(EntityRendererProvider.Context context) {
+	public GeneralVallinaPlayerModelRenderer(EntityRendererProvider.Context context) {
 		super(context);
 		wideRenderer = this.new ModelRenderer(context, false);
 		slimRenderer = this.new ModelRenderer(context, true);

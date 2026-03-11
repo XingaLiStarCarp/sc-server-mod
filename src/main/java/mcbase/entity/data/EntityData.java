@@ -226,4 +226,8 @@ public class EntityData {
 		return (double) unsafe.read_double(navigation, EntityData.PathNavigation_speedModifier);
 	}
 
+	public static final void syncEntityData(Entity srcEntity, Entity destEntity) {
+		EntityData.copyData(srcEntity, destEntity);// 同步内存字段值
+		SynchedEntityDataOp.copyData(srcEntity.getEntityData(), destEntity.getEntityData());// 同步SynchedEntityData各项值
+	}
 }

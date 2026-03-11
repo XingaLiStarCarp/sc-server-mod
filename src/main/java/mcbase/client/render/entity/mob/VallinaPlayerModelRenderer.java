@@ -32,13 +32,13 @@ import net.minecraft.world.phys.Vec3;
  * 
  * @param <_T>
  */
-public abstract class FixedPlayerModelRenderer<_T extends LivingEntity> extends LivingEntityRenderer<_T, PlayerModel<_T>> {
+public abstract class VallinaPlayerModelRenderer<_T extends LivingEntity> extends LivingEntityRenderer<_T, PlayerModel<_T>> {
 	/**
 	 * 模型地面阴影半径
 	 */
 	public static final float DEFAULT_SHADOW_RADIUS = 0.5f;
 
-	public FixedPlayerModelRenderer(EntityRendererProvider.Context context, boolean slim) {
+	public VallinaPlayerModelRenderer(EntityRendererProvider.Context context, boolean slim) {
 		super(context, new PlayerModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim), DEFAULT_SHADOW_RADIUS);
 		// 盔甲层
 		this.addLayer(new HumanoidArmorLayer<>(this,
@@ -150,7 +150,7 @@ public abstract class FixedPlayerModelRenderer<_T extends LivingEntity> extends 
 	}
 
 	/**
-	 * 动画的肢体旋转变换.<br>
+	 * 动画插值的肢体旋转变换.<br>
 	 * 如果没有此方法则肢体动画（包括部分Pose，例如游泳姿态）会出现渲染错位。<br>
 	 * 
 	 * @param entity
