@@ -10,6 +10,7 @@ public class GunAttackGoal extends AttackGoal {
 	public GunAttackGoal(Mob mob, int attackInterval) {
 		super(mob, attackInterval);
 		gunOperator = new TaczGunOperator(mob);
+		gunOperator.setReloadingNeedCheckAmmo(false);// AI射击不需要检查是否有弹夹就可以直接换弹
 		this.setBoundDistances(4, 32);
 	}
 
@@ -22,12 +23,10 @@ public class GunAttackGoal extends AttackGoal {
 	public void attack(double currentDistance, int currentBoundLevel) {
 		switch (currentBoundLevel) {
 		case 0:
-			gunOperator.craw(false);
 			gunOperator.aim(false);
 			gunOperator.melee();
 			break;
 		case 1:
-			gunOperator.craw(true);
 			gunOperator.aim(true);
 			gunOperator.shootAuto(this.mob.getTarget().position());
 			break;
@@ -36,6 +35,5 @@ public class GunAttackGoal extends AttackGoal {
 
 	@Override
 	public void exit() {
-		gunOperator.craw(false);
 	}
 }

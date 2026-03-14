@@ -4,11 +4,11 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 
-public class CustomPlayerRenderer extends GeneralPlayerRenderer {
+public class CustomGeneralPlayerRenderer extends GeneralPlayerRenderer {
 	private ResourceLocation currentTextureLocation;
 	private boolean currentIsSlim;
 
-	public CustomPlayerRenderer(EntityRendererProvider.Context context) {
+	public CustomGeneralPlayerRenderer(EntityRendererProvider.Context context) {
 		super(context);
 	}
 

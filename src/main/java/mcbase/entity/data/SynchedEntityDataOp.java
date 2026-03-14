@@ -29,6 +29,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 /**
@@ -554,6 +556,7 @@ public class SynchedEntityDataOp {
 	public static final EntityDataAccessor<Integer> DATA_TICKS_FROZEN;
 
 	static {
+		reflection.find_class("net.minecraft.world.entity.Entity", true);
 		DATA_SHARED_FLAGS_ID = (EntityDataAccessor<Byte>) unsafe.read_static_reference(Entity.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_19805_"));
 		DATA_AIR_SUPPLY_ID = (EntityDataAccessor<Integer>) unsafe.read_static_reference(Entity.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_19832_"));
 		DATA_CUSTOM_NAME = (EntityDataAccessor<Optional<Component>>) unsafe.read_static_reference(Entity.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_19833_"));
@@ -603,5 +606,51 @@ public class SynchedEntityDataOp {
 
 	public static final boolean getLivingEntityFlag(LivingEntity entity, int flag) {
 		return (entity.getEntityData().get(DATA_LIVING_ENTITY_FLAGS) & flag) == 0 ? false : true;
+	}
+
+	/**
+	 * Player所属数据
+	 */
+	public static final EntityDataAccessor<Float> DATA_PLAYER_ABSORPTION_ID;
+	public static final EntityDataAccessor<Integer> DATA_SCORE_ID;
+	public static final EntityDataAccessor<Byte> DATA_PLAYER_MODEL_CUSTOMISATION;
+	public static final EntityDataAccessor<Byte> DATA_PLAYER_MAIN_HAND;
+	public static final EntityDataAccessor<CompoundTag> DATA_SHOULDER_LEFT;
+	public static final EntityDataAccessor<CompoundTag> DATA_SHOULDER_RIGHT;
+
+	static {
+		// 需要先初始化类才能获得其静态字段
+		reflection.find_class("net.minecraft.world.entity.player.Player", true);
+		DATA_PLAYER_ABSORPTION_ID = (EntityDataAccessor<Float>) unsafe.read_static_reference(Player.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_36107_"));
+		DATA_SCORE_ID = (EntityDataAccessor<Integer>) unsafe.read_static_reference(Player.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_36108_"));
+		DATA_PLAYER_MODEL_CUSTOMISATION = (EntityDataAccessor<Byte>) unsafe.read_static_reference(Player.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_36089_"));
+		DATA_PLAYER_MAIN_HAND = (EntityDataAccessor<Byte>) unsafe.read_static_reference(Player.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_36090_"));
+		DATA_SHOULDER_LEFT = (EntityDataAccessor<CompoundTag>) unsafe.read_static_reference(Player.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_36091_"));
+		DATA_SHOULDER_RIGHT = (EntityDataAccessor<CompoundTag>) unsafe.read_static_reference(Player.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_36092_"));
+	}
+
+	public static final int PLAYER_MODEL_PART_CAPE = PlayerModelPart.CAPE.getMask();
+	public static final int PLAYER_MODEL_PART_HAT = PlayerModelPart.HAT.getMask();
+	public static final int PLAYER_MODEL_PART_JACKET = PlayerModelPart.JACKET.getMask();
+	public static final int PLAYER_MODEL_PART_LEFT_PANTS_LEG = PlayerModelPart.LEFT_PANTS_LEG.getMask();
+	public static final int PLAYER_MODEL_PART_LEFT_SLEEVE = PlayerModelPart.LEFT_SLEEVE.getMask();
+	public static final int PLAYER_MODEL_PART_RIGHT_PANTS_LEG = PlayerModelPart.RIGHT_PANTS_LEG.getMask();
+	public static final int PLAYER_MODEL_PART_RIGHT_SLEEVE = PlayerModelPart.RIGHT_SLEEVE.getMask();
+
+	public static final int PLAYER_MODEL_PART_ALL = PLAYER_MODEL_PART_CAPE |
+			PLAYER_MODEL_PART_HAT |
+			PLAYER_MODEL_PART_JACKET |
+			PLAYER_MODEL_PART_LEFT_PANTS_LEG |
+			PLAYER_MODEL_PART_LEFT_SLEEVE |
+			PLAYER_MODEL_PART_RIGHT_PANTS_LEG |
+			PLAYER_MODEL_PART_RIGHT_SLEEVE;
+
+	/**
+	 * 设置该玩家在客户端渲染时渲染的组件
+	 * 
+	 * @param player
+	 */
+	public static final void showPlayerModelParts(Player player, int parts) {
+		player.getEntityData().set(DATA_PLAYER_MODEL_CUSTOMISATION, (byte) parts);
 	}
 }

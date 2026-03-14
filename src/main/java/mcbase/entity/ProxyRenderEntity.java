@@ -8,7 +8,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import mcbase.LogicalEnd;
 import mcbase.entity.data.EntityData;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
@@ -39,11 +38,10 @@ public interface ProxyRenderEntity<_RenderingEntity extends Entity, _Model> {
 
 	/**
 	 * 获取实体数据<br>
-	 * 如果一个继承自Entity的类实现了此接口，则可以直接使用Entity::getEntityData()。<br>
 	 * 
 	 * @return
 	 */
-	public default SynchedEntityData getEntityData() {
+	public default SynchedEntityData entityData() {
 		return bindEntity().getEntityData();
 	}
 
@@ -63,7 +61,7 @@ public interface ProxyRenderEntity<_RenderingEntity extends Entity, _Model> {
 	 */
 	public default void syncRenderingEntity() {
 		// 仅客户端同步
-		if (LogicalEnd.isClient()) {
+		if (bindEntity().level().isClientSide()) {
 			this.syncRenderingEntityData();
 		}
 	}

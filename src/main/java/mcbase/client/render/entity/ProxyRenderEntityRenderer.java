@@ -30,8 +30,18 @@ public abstract class ProxyRenderEntityRenderer<_ProxyEntity extends ProxyRender
 		this.shadowStrength = EntityRenderers.getEntityRendererShadowStrength(proxyEntityRenderer);// 设置实体脚下阴影的强度
 	}
 
-	public void renderProxyEntity(_ProxyEntity proxyEntity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+	/**
+	 * 在渲染前进行可能存在的模型设置
+	 * 
+	 * @param proxyEntity
+	 */
+	protected void setupModel(_ProxyRenderer proxyEntityRenderer, _ProxyEntity proxyEntity) {
+
+	}
+
+	public void render(_ProxyEntity proxyEntity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		if (proxyEntity != null) {
+			this.setupModel(proxyEntityRenderer, proxyEntity);
 			((EntityRenderer) proxyEntityRenderer).render(proxyEntity.renderingEntity(), entityYaw, partialTick, poseStack, bufferSource, packedLight);
 		}
 	}
@@ -60,7 +70,7 @@ public abstract class ProxyRenderEntityRenderer<_ProxyEntity extends ProxyRender
 
 	@Override
 	public void render(Entity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-		this.renderProxyEntity(this.dispatch(entity), entityYaw, partialTick, poseStack, bufferSource, packedLight);
+		this.render(this.dispatch(entity), entityYaw, partialTick, poseStack, bufferSource, packedLight);
 	}
 
 	@Override

@@ -77,4 +77,9 @@ public class HumanoidMob extends BaseMob implements HumanoidEntity {
 	protected void loadData(CompoundTag compound, SynchedEntityData entityData) {
 		this.loadAllHumanoidEntityData(compound, entityData);
 	}
+
+	@Override
+	public SynchedEntityData entityData() {
+		return entityData;
+	}
 }

@@ -195,6 +195,7 @@ public abstract class VallinaPlayerModelRenderer<_T extends LivingEntity> extend
 	 * 是否渲染名字。<br>
 	 * 采用MobRenderer同款判定。<br>
 	 */
+	@Override
 	protected boolean shouldShowName(_T entity) {
 		return super.shouldShowName(entity) && (entity.shouldShowName() || entity.hasCustomName() && entity == this.entityRenderDispatcher.crosshairPickEntity);
 	}

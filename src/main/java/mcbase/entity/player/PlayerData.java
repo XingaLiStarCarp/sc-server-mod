@@ -27,7 +27,6 @@ public class PlayerData {
 			AbstractClientPlayer_deltaMovementOnPreviousTick = reflection.find_declared_field(AbstractClientPlayer.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_271420_"));
 			LocalPlayer_usingItemHand = reflection.find_declared_field(LocalPlayer.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_108610_"));
 			LocalPlayer_crouching = reflection.find_declared_field(LocalPlayer.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_108601_"));
-
 		}
 	}
 

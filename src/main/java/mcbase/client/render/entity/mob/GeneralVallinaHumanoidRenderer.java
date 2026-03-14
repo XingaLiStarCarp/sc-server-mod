@@ -28,7 +28,7 @@ public class GeneralVallinaHumanoidRenderer<_T extends LivingEntity & Humanoid> 
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(_T entity) {
+	public ResourceLocation skinTexture(_T entity) {
 		return entity.getSkin();
 	}
 

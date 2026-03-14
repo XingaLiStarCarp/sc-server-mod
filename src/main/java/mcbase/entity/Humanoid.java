@@ -99,7 +99,7 @@ public interface Humanoid {
 		/**
 		 * 继承Entity类自动实现
 		 */
-		public abstract SynchedEntityData getEntityData();
+		public abstract SynchedEntityData entityData();
 
 		/**
 		 * 高频调用，必须返回defineAllEntityData()得到的static数组
@@ -110,7 +110,7 @@ public interface Humanoid {
 		public abstract EntityDataAccessor[] humanoidEntityDataAccs();
 
 		public default String getSkinId() {
-			return (String) getEntityData().get(humanoidEntityDataAccs()[IDX_SKIN]);
+			return (String) entityData().get(humanoidEntityDataAccs()[IDX_SKIN]);
 		}
 
 		/**
@@ -119,16 +119,16 @@ public interface Humanoid {
 		 * @param skin
 		 */
 		public default void setSkinId(String skin) {
-			getEntityData().set(humanoidEntityDataAccs()[IDX_SKIN], skin);
+			entityData().set(humanoidEntityDataAccs()[IDX_SKIN], skin);
 		}
 
 		@Override
 		public default boolean isSlim() {
-			return (boolean) getEntityData().get(humanoidEntityDataAccs()[IDX_IS_SLIM]);
+			return (boolean) entityData().get(humanoidEntityDataAccs()[IDX_IS_SLIM]);
 		}
 
 		public default void seIsSlim(boolean slim) {
-			getEntityData().set(humanoidEntityDataAccs()[IDX_IS_SLIM], slim);
+			entityData().set(humanoidEntityDataAccs()[IDX_IS_SLIM], slim);
 		}
 	}
 }

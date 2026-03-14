@@ -33,8 +33,20 @@ import net.minecraftforge.registries.RegistryObject;
 public class GeneralHumanoidMob extends BaseMob {
 
 	public static class GeneralHumanoidModelInfo {
-		public static final int TYPE_PLAYER = 0;
+		/**
+		 * 原版玩家模型
+		 */
+		public static final int TYPE_HUMANOID = 0;
+
+		/**
+		 * TLM女仆或YSM模型
+		 */
 		public static final int TYPE_MAID = 1;
+
+		/**
+		 * 如果有mod修改过玩家的渲染器，则此选项将使用修改后的渲染器
+		 */
+		public static final int TYPE_PLAYER = 2;
 
 		public int renderType;
 		public PlayerModelAsset vallinaPlayerModel;
@@ -50,7 +62,7 @@ public class GeneralHumanoidMob extends BaseMob {
 			return new GeneralHumanoidModelInfo(renderType, vallinaPlayerModel, maidModel);
 		}
 
-		public static final GeneralHumanoidModelInfo DEFAULT = GeneralHumanoidModelInfo.pack(GeneralHumanoidModelInfo.TYPE_PLAYER, HumanoidMob.RENDERER_TYPE.defaultAsset(), MaidMob.RENDERER_TYPE.defaultAsset());
+		public static final GeneralHumanoidModelInfo DEFAULT = GeneralHumanoidModelInfo.pack(GeneralHumanoidModelInfo.TYPE_HUMANOID, HumanoidMob.RENDERER_TYPE.defaultAsset(), MaidMob.RENDERER_TYPE.defaultAsset());
 	}
 
 	public static final EntityRendererType<GeneralHumanoidModelInfo> RENDERER_TYPE = new EntityRendererType<>();

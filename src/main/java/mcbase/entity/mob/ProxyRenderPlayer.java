@@ -30,8 +30,8 @@ public interface ProxyRenderPlayer extends ProxyRenderEntity<Player, PlayerModel
 
 	public interface ProxyRenderPlayerEntity extends ProxyRenderPlayer, HumanoidEntity {
 		@Override
-		default SynchedEntityData getEntityData() {
-			return ProxyRenderPlayer.super.getEntityData();
+		default SynchedEntityData entityData() {
+			return ProxyRenderPlayer.super.entityData();
 		}
 	}
 }

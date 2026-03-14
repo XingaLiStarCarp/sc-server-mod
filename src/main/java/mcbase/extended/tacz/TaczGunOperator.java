@@ -11,14 +11,13 @@ import jvmsp.reflection;
 import jvmsp.unsafe;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import scba.ModEntry;
 
 public class TaczGunOperator {
 	/**
-	 * 通过Unsafe修改LivingEntityMixin的字段实现自定义
+	 * 通过Unsafe修改LivingEntityMixin的tacz$ammoCheck字段实现自定义
 	 */
 	public static class CustomLivingEntityAmmoCheck extends LivingEntityAmmoCheck {
 		private boolean needCheckAmmo;
@@ -80,7 +79,7 @@ public class TaczGunOperator {
 		this.entity = shooter;
 		this.gunOperator = IGunOperator.fromLivingEntity(shooter);
 		this.hand = hand;
-		this.tacz$ammoCheck = new CustomLivingEntityAmmoCheck(false, true);
+		this.tacz$ammoCheck = new CustomLivingEntityAmmoCheck(true, true);
 		CustomLivingEntityAmmoCheck.setLivingEntityAmmoCheck(gunOperator, tacz$ammoCheck);
 	}
 
@@ -102,6 +101,22 @@ public class TaczGunOperator {
 	 */
 	public final void melee() {
 		this.gunOperator.melee();
+	}
+
+	public final void draw() {
+		gunOperator.draw(() -> this.getGunItem());
+	}
+
+	public final void bolt() {
+		gunOperator.bolt();
+	}
+
+	public final void reload() {
+		gunOperator.reload();
+	}
+
+	public final int getGunAmmo() {
+		return TaczGuns.getGunAmmo(this.getGunItem());
 	}
 
 	/**
@@ -143,16 +158,20 @@ public class TaczGunOperator {
 	}
 
 	public final ShootResult shootAuto(Vec3 target) {
-		ShootResult result = shoot(target);
+		this.bolt();// 先拉栓子弹上膛
+		ShootResult result = shoot(target);// 射击
+		if (getGunAmmo() == 0) {
+			this.reload();// 本次射击完成后，如果没有子弹则上弹
+		}
 		switch (result) {
 		case ShootResult.NOT_DRAW:
-			gunOperator.draw(() -> this.getGunItem());
+			this.draw();
 			break;
 		case ShootResult.NEED_BOLT:
-			gunOperator.bolt();
+			this.bolt();
 			break;
 		case ShootResult.NO_AMMO:
-			gunOperator.reload();
+			this.reload();
 			break;
 		default:
 			break;
@@ -168,19 +187,7 @@ public class TaczGunOperator {
 		this.tacz$ammoCheck.setShootConsumesAmmoOrNot(consumesAmmoOrNot);
 	}
 
-	public void craw(boolean craw) {
-		if (craw) {
-			entity.setPose(Pose.SWIMMING);
-		} else {
-			entity.setPose(Pose.STANDING);
-		}
-	}
-
-	public void crouch(boolean crouch) {
-		if (crouch) {
-			entity.setPose(Pose.CROUCHING);
-		} else {
-			entity.setPose(Pose.STANDING);
-		}
+	public void crawl(boolean isCrawl) {
+		gunOperator.crawl(isCrawl);
 	}
 }

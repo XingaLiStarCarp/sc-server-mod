@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.api.item.gun.FireMode;
+import com.tacz.guns.api.item.nbt.GunItemDataAccessor;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 
@@ -63,5 +64,15 @@ public class TaczGuns {
 		ResourceLocation id = ResourceLocation.parse(gunId);
 		GunData data = getGunData(id);
 		return getGun(id, data.getAmmoAmount(), data.getFireModeSet().getFirst(), false);
+	}
+
+	/**
+	 * 获取当前枪械的弹药数
+	 * 
+	 * @param gunItem
+	 * @return
+	 */
+	public static final int getGunAmmo(ItemStack gunItem) {
+		return ((GunItemDataAccessor) gunItem.getItem()).getCurrentAmmoCount(gunItem);
 	}
 }

@@ -590,7 +590,7 @@ public interface ProxyRenderMaid extends ProxyRenderEntity<EntityMaid, MaidModel
 
 		@Override
 		public default String getTlmModelId() {
-			return (String) getEntityData().get(maidEntityDataAccs()[IDX_TLM_MODEL_ID]);
+			return (String) entityData().get(maidEntityDataAccs()[IDX_TLM_MODEL_ID]);
 		}
 
 		/**
@@ -600,47 +600,47 @@ public interface ProxyRenderMaid extends ProxyRenderEntity<EntityMaid, MaidModel
 		 */
 		@Override
 		public default void setTlmModelId(String modelId) {
-			getEntityData().set(maidEntityDataAccs()[IDX_TLM_MODEL_ID], modelId);
+			entityData().set(maidEntityDataAccs()[IDX_TLM_MODEL_ID], modelId);
 		}
 
 		@Override
 		public default boolean isYsmModel() {
-			return (boolean) getEntityData().get(maidEntityDataAccs()[IDX_IS_YSM_MODEL]);
+			return (boolean) entityData().get(maidEntityDataAccs()[IDX_IS_YSM_MODEL]);
 		}
 
 		@Override
 		public default void setIsYsmModel(boolean isYsmModel) {
-			getEntityData().set(maidEntityDataAccs()[IDX_IS_YSM_MODEL], isYsmModel);
+			entityData().set(maidEntityDataAccs()[IDX_IS_YSM_MODEL], isYsmModel);
 		}
 
 		@Override
 		public default String getYsmModelId() {
-			return (String) getEntityData().get(maidEntityDataAccs()[IDX_YSM_MODEL_ID]);
+			return (String) entityData().get(maidEntityDataAccs()[IDX_YSM_MODEL_ID]);
 		}
 
 		@Override
 		public default void setYsmModelId(String ysmModelId) {
-			getEntityData().set(maidEntityDataAccs()[IDX_YSM_MODEL_ID], ysmModelId);
+			entityData().set(maidEntityDataAccs()[IDX_YSM_MODEL_ID], ysmModelId);
 		}
 
 		@Override
 		public default String getYsmModelTexture() {
-			return (String) getEntityData().get(maidEntityDataAccs()[IDX_YSM_MODEL_TEXTURE]);
+			return (String) entityData().get(maidEntityDataAccs()[IDX_YSM_MODEL_TEXTURE]);
 		}
 
 		@Override
 		public default void setYsmModelTexture(String ysmModelTexture) {
-			getEntityData().set(maidEntityDataAccs()[IDX_YSM_MODEL_TEXTURE], ysmModelTexture);
+			entityData().set(maidEntityDataAccs()[IDX_YSM_MODEL_TEXTURE], ysmModelTexture);
 		}
 
 		@Override
 		public default Component getYsmModelName() {
-			return (Component) getEntityData().get(maidEntityDataAccs()[IDX_YSM_MODEL_NAME]);
+			return (Component) entityData().get(maidEntityDataAccs()[IDX_YSM_MODEL_NAME]);
 		}
 
 		@Override
 		public default void setYsmModelName(Component ysmModelName) {
-			getEntityData().set(maidEntityDataAccs()[IDX_YSM_MODEL_NAME], ysmModelName);
+			entityData().set(maidEntityDataAccs()[IDX_YSM_MODEL_NAME], ysmModelName);
 		}
 
 		@Override
@@ -650,23 +650,23 @@ public interface ProxyRenderMaid extends ProxyRenderEntity<EntityMaid, MaidModel
 
 		@Override
 		public default String getYsmAnimation() {
-			return (String) getEntityData().get(maidEntityDataAccs()[IDX_YSM_ANIMATION]);
+			return (String) entityData().get(maidEntityDataAccs()[IDX_YSM_ANIMATION]);
 		}
 
 		@Override
 		public default boolean isYsmAnimationPlaying() {
-			return (boolean) getEntityData().get(maidEntityDataAccs()[IDX_YSM_ANIMATION_PLAYING]);
+			return (boolean) entityData().get(maidEntityDataAccs()[IDX_YSM_ANIMATION_PLAYING]);
 		}
 
 		@Override
 		public default void playRouletteAnim(String rouletteAnim) {
-			getEntityData().set(maidEntityDataAccs()[IDX_YSM_ANIMATION], rouletteAnim);
-			getEntityData().set(maidEntityDataAccs()[IDX_YSM_ANIMATION_PLAYING], true);
+			entityData().set(maidEntityDataAccs()[IDX_YSM_ANIMATION], rouletteAnim);
+			entityData().set(maidEntityDataAccs()[IDX_YSM_ANIMATION_PLAYING], true);
 		}
 
 		@Override
 		public default void stopRouletteAnim() {
-			getEntityData().set(maidEntityDataAccs()[IDX_YSM_ANIMATION_PLAYING], false);
+			entityData().set(maidEntityDataAccs()[IDX_YSM_ANIMATION_PLAYING], false);
 		}
 	}
 }

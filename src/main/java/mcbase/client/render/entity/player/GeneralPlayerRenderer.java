@@ -17,11 +17,12 @@ public abstract class GeneralPlayerRenderer extends EntityRenderer<AbstractClien
 		}
 
 		@Override
-		public ResourceLocation getTextureLocation(AbstractClientPlayer entity) {
+		public final ResourceLocation getTextureLocation(AbstractClientPlayer entity) {
 			return GeneralPlayerRenderer.this.getTextureLocation(entity);
 		}
 
-		protected boolean shouldShowName(AbstractClientPlayer entity) {
+		@Override
+		protected final boolean shouldShowName(AbstractClientPlayer entity) {
 			return GeneralPlayerRenderer.this.shouldShowName(entity);
 		}
 	}
@@ -35,6 +36,11 @@ public abstract class GeneralPlayerRenderer extends EntityRenderer<AbstractClien
 		slimRenderer = this.new CustomPlayerRenderer(context, true);
 	}
 
+	/**
+	 * YSM的PlayerRenderer中render()方法未调用shouldShowName()和renderNameTag()函数。<br>
+	 * 由于YSM闭源无法兼容，因此加YSM后实体的头上会显示一大串字符串且无法关闭。<br>
+	 */
+	@Override
 	protected boolean shouldShowName(AbstractClientPlayer entity) {
 		return super.shouldShowName(entity);
 	}

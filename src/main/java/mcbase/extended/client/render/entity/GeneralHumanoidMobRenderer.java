@@ -3,8 +3,8 @@ package mcbase.extended.client.render.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import mcbase.client.render.entity.EntityRenderers;
+import mcbase.client.render.entity.mob.GeneralVallinaPlayerModelRenderer;
 import mcbase.client.render.entity.player.ProxyRenderPlayerRenderer;
-import mcbase.entity.mob.ProxyRenderPlayer.ProxyRenderPlayerEntity;
 import mcbase.extended.entity.GeneralHumanoidMob;
 import mcbase.extended.entity.GeneralHumanoidMob.GeneralHumanoidModelInfo;
 import mcbase.extended.tlm.client.render.entity.maid.ProxyRenderMaidRenderer;
@@ -22,40 +22,36 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 @OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(value = Dist.CLIENT, bus = Bus.MOD)
 public class GeneralHumanoidMobRenderer extends EntityRenderer<GeneralHumanoidMob> {
-	ProxyRenderPlayerRenderer humanoidRenderer;
+	GeneralVallinaPlayerModelRenderer<?> humanoidRenderer;
+	ProxyRenderPlayerRenderer playerRenderer;
 	ProxyRenderMaidRenderer maidRenderer;
 
 	public GeneralHumanoidMobRenderer(EntityRendererProvider.Context context) {
 		super(context);
 		this.shadowRadius = 0.5f;
-		humanoidRenderer = new ProxyRenderPlayerRenderer(context);
+		humanoidRenderer = new GeneralVallinaPlayerModelRenderer<>(context);
+		playerRenderer = new ProxyRenderPlayerRenderer(context);
 		maidRenderer = new ProxyRenderMaidRenderer(context);
 	}
 
 	@Override
 	public void render(GeneralHumanoidMob entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		switch (entity.getRenderType()) {
-		case GeneralHumanoidModelInfo.TYPE_PLAYER:
-			ProxyRenderPlayerEntity proxyPlayer = entity.proxyRenderPlayer();
-			humanoidRenderer.setupModelAsset(proxyPlayer.getSkin(), proxyPlayer.isSlim());
-			humanoidRenderer.renderProxyEntity(proxyPlayer, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+		case GeneralHumanoidModelInfo.TYPE_HUMANOID:
+			humanoidRenderer.render(entity, entity.proxyRenderPlayer(), entityYaw, partialTicks, poseStack, bufferSource, packedLight);
 			break;
 		case GeneralHumanoidModelInfo.TYPE_MAID:
-			maidRenderer.renderProxyEntity(entity.proxyRenderMaid(), entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+			maidRenderer.render(entity.proxyRenderMaid(), entityYaw, partialTicks, poseStack, bufferSource, packedLight);
+			break;
+		case GeneralHumanoidModelInfo.TYPE_PLAYER:
+			playerRenderer.render(entity.proxyRenderPlayer(), entityYaw, partialTicks, poseStack, bufferSource, packedLight);
 			break;
 		}
 	}
 
 	@Override
 	public ResourceLocation getTextureLocation(GeneralHumanoidMob entity) {
-		switch (entity.getRenderType()) {
-		case GeneralHumanoidModelInfo.TYPE_PLAYER:
-			return humanoidRenderer.getTextureLocation(entity);
-		case GeneralHumanoidModelInfo.TYPE_MAID:
-			return maidRenderer.getTextureLocation(entity);
-		default:
-			return null;
-		}
+		throw new java.lang.IllegalStateException("never used");
 	}
 
 	static {
