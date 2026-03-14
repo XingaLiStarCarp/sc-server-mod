@@ -2,6 +2,7 @@ package mcbase.client.render.entity.player;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -9,8 +10,14 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 
 public abstract class GeneralPlayerRenderer extends EntityRenderer<AbstractClientPlayer> {
+	/**
+	 * PlayerRenderer可能被Mixin。<br>
+	 * YSM在渲染玩家的事件中使用它自己的渲染器进行的渲染，因此该类自定义的shouldShowName()会被YSM覆盖，实际不生效。<br>
+	 * 且YSM的渲染器中会通过player.getTeam().getNameTagVisibility()来决定是否渲染GameProfile的名称。<br>
+	 */
 	private class CustomPlayerRenderer extends PlayerRenderer {
 		public CustomPlayerRenderer(Context context, boolean slim) {
 			super(context, slim);
@@ -25,6 +32,19 @@ public abstract class GeneralPlayerRenderer extends EntityRenderer<AbstractClien
 		protected final boolean shouldShowName(AbstractClientPlayer entity) {
 			return GeneralPlayerRenderer.this.shouldShowName(entity);
 		}
+
+		@Override
+		public final void render(AbstractClientPlayer entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+			if (this.shouldShowName(entity)) {
+				super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);// 此处渲染玩家时，shouldShowName()必定会为true
+			} else {
+				Minecraft mc = Minecraft.getInstance();
+				Entity original = mc.cameraEntity;
+				mc.cameraEntity = entity;// 此为兼容Geckolib、YSM的shouldShowName()判断，当cameraEntity与渲染的实体相同时，不会渲染名字，但实体模型本身还会渲染
+				super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+				mc.cameraEntity = original;
+			}
+		}
 	}
 
 	private PlayerRenderer wideRenderer;
@@ -34,15 +54,6 @@ public abstract class GeneralPlayerRenderer extends EntityRenderer<AbstractClien
 		super(context);
 		wideRenderer = this.new CustomPlayerRenderer(context, false);
 		slimRenderer = this.new CustomPlayerRenderer(context, true);
-	}
-
-	/**
-	 * YSM的PlayerRenderer中render()方法未调用shouldShowName()和renderNameTag()函数。<br>
-	 * 由于YSM闭源无法兼容，因此加YSM后实体的头上会显示一大串字符串且无法关闭。<br>
-	 */
-	@Override
-	protected boolean shouldShowName(AbstractClientPlayer entity) {
-		return super.shouldShowName(entity);
 	}
 
 	/**

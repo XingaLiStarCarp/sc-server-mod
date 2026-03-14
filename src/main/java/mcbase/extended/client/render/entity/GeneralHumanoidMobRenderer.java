@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -22,7 +23,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 @OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(value = Dist.CLIENT, bus = Bus.MOD)
 public class GeneralHumanoidMobRenderer extends EntityRenderer<GeneralHumanoidMob> {
-	GeneralVallinaPlayerModelRenderer<?> humanoidRenderer;
+	GeneralVallinaPlayerModelRenderer<LivingEntity> humanoidRenderer;
 	ProxyRenderPlayerRenderer playerRenderer;
 	ProxyRenderMaidRenderer maidRenderer;
 
@@ -51,7 +52,16 @@ public class GeneralHumanoidMobRenderer extends EntityRenderer<GeneralHumanoidMo
 
 	@Override
 	public ResourceLocation getTextureLocation(GeneralHumanoidMob entity) {
-		throw new java.lang.IllegalStateException("never used");
+		switch (entity.getRenderType()) {
+		case GeneralHumanoidModelInfo.TYPE_HUMANOID:
+			return humanoidRenderer.getTextureLocation(entity);
+		case GeneralHumanoidModelInfo.TYPE_MAID:
+			return maidRenderer.getTextureLocation(entity);
+		case GeneralHumanoidModelInfo.TYPE_PLAYER:
+			return playerRenderer.getTextureLocation(entity);
+		default:
+			return null;
+		}
 	}
 
 	static {

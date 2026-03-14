@@ -44,7 +44,8 @@ public class GeneralHumanoidMob extends BaseMob {
 		public static final int TYPE_MAID = 1;
 
 		/**
-		 * 如果有mod修改过玩家的渲染器，则此选项将使用修改后的渲染器
+		 * 如果有mod修改过玩家的渲染器，则此选项将使用修改后的渲染器。<br>
+		 * 如果装了YSM，请勿使用本选项，改用TYPE_MAID。<br>
 		 */
 		public static final int TYPE_PLAYER = 2;
 

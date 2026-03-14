@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import cpw.mods.modlauncher.api.INameMappingService;
 import jvmsp.reflection;
 import jvmsp.symbols;
@@ -14,13 +16,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -176,5 +181,21 @@ public class EntityRenderers {
 
 	public static final void setEntityRendererShadowStrength(EntityRenderer<?> renderer, float shadowStrength) {
 		unsafe.write(renderer, EntityRenderer_shadowStrength, shadowStrength);
+	}
+
+	private static MethodHandle LivingEntityRenderer_render;
+
+	static {
+		LivingEntityRenderer_render = symbols.find_special_method(LivingEntityRenderer.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, "m_7392_"),
+				void.class,
+				LivingEntity.class, float.class, float.class, PoseStack.class, MultiBufferSource.class, int.class);
+	}
+
+	public static final void renderLivingEntity(LivingEntityRenderer<?, ?> renderer, LivingEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		try {
+			LivingEntityRenderer_render.invoke(renderer, entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+		} catch (Throwable ex) {
+			ex.printStackTrace();
+		}
 	}
 }

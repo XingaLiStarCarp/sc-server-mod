@@ -587,6 +587,28 @@ public class SynchedEntityDataOp {
 		return entityData;
 	}
 
+	public static final int ENTITY_SHARED_FLAG_INVISIBLE = 5;
+
+	protected boolean getEntitySharedFlag(Entity entity, int flag) {
+		return (entity.getEntityData().get(DATA_SHARED_FLAGS_ID) & 1 << flag) != 0;
+	}
+
+	protected void setEntitySharedFlag(Entity entity, int flags, boolean value) {
+		SynchedEntityData entityData = entity.getEntityData();
+		byte original = entityData.get(DATA_SHARED_FLAGS_ID);
+		entityData.set(DATA_LIVING_ENTITY_FLAGS, (byte) (value ? (original |= flags) : (original &= ~flags)));
+	}
+
+	/**
+	 * 设置实体是否可见
+	 * 
+	 * @param entity
+	 * @param invisible
+	 */
+	public void setEntityInvisible(Entity entity, boolean invisible) {
+		setEntitySharedFlag(entity, ENTITY_SHARED_FLAG_INVISIBLE, invisible);
+	}
+
 	public static final int LIVING_ENTITY_FLAG_USING_ITEM = 0b00000001;
 	public static final int LIVING_ENTITY_FLAG_USING_OFFHAND = 0b00000010;
 	public static final int LIVING_ENTITY_FLAG_AUTO_SPIN_ATTACK = 0b00000100;
@@ -605,7 +627,7 @@ public class SynchedEntityDataOp {
 	}
 
 	public static final boolean getLivingEntityFlag(LivingEntity entity, int flag) {
-		return (entity.getEntityData().get(DATA_LIVING_ENTITY_FLAGS) & flag) == 0 ? false : true;
+		return (entity.getEntityData().get(DATA_LIVING_ENTITY_FLAGS) & flag) != 0;
 	}
 
 	/**

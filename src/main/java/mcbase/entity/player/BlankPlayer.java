@@ -2,6 +2,7 @@ package mcbase.entity.player;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 
@@ -16,7 +17,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
@@ -27,12 +27,17 @@ public class BlankPlayer {
 
 	private static Field ClientPacketListener_localGameProfile;
 
+	private static Field GameProfile_id;
+	private static Field GameProfile_name;
+
 	static {
 		// 仅客户端有LocalPlayer类
 		if (LogicalEnd.isClient()) {
 			AbstractClientPlayer_ctor = reflection.find_constructor(AbstractClientPlayer.class, ClientLevel.class, GameProfile.class);
 			ClientPacketListener_localGameProfile = reflection.find_declared_field(ClientPacketListener.class, ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_104886_"));
 		}
+		GameProfile_id = reflection.find_declared_field(GameProfile.class, "id");
+		GameProfile_name = reflection.find_declared_field(GameProfile.class, "name");
 	}
 
 	public static final Player blankAbstractClientPlayer(Class<? extends AbstractClientPlayer> abstractClientPlayerClazz, Level clientLevel, GameProfile profile) {
@@ -60,6 +65,7 @@ public class BlankPlayer {
 			// 由于有部分mod会Mixin类LocalPlayer的构造函数或添加新字段，因此这里采用直接调用构造函数避免新加的字段没有初始化。
 			LocalPlayer player = new LocalPlayer(Minecraft.getInstance(), (ClientLevel) clientLevel, blankClientPacketListener(profile), null, null, false, false);
 			SynchedEntityDataOp.showPlayerModelParts(player, SynchedEntityDataOp.PLAYER_MODEL_PART_ALL);
+			player.getTeam();
 			return player;
 		} else {
 			return null;
@@ -70,7 +76,22 @@ public class BlankPlayer {
 		return blankLocalPlayer(LogicalEnd.clientLevel(), profile);
 	}
 
-	public static final Player blankLocalPlayer(Entity initEntity) {
-		return blankLocalPlayer(new GameProfile(initEntity.getUUID(), initEntity.getDisplayName().toString()));
+	public static final GameProfile createGameProfile(UUID uuid, String name) {
+		GameProfile profile = unsafe.allocate(GameProfile.class);
+		unsafe.write(profile, GameProfile_id, uuid);
+		unsafe.write(profile, GameProfile_name, name);
+		return profile;
+	}
+
+	public static final GameProfile createGameProfile(String name) {
+		return createGameProfile(null, name);
+	}
+
+	public static final GameProfile blankGameProfile() {
+		return createGameProfile("");
+	}
+
+	public static final Player blankLocalPlayer() {
+		return blankLocalPlayer(blankGameProfile());
 	}
 }

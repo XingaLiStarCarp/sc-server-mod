@@ -17,7 +17,7 @@ public interface ProxyRenderPlayer extends ProxyRenderEntity<Player, PlayerModel
 	 */
 	@Override
 	public default Player blankRenderingEntity(Entity bindEntity) {
-		return BlankPlayer.blankLocalPlayer(bindEntity);
+		return BlankPlayer.blankLocalPlayer();
 	}
 
 	@Override
