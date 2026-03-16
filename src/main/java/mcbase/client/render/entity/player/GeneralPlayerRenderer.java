@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 
 public abstract class GeneralPlayerRenderer extends EntityRenderer<AbstractClientPlayer> {
 	/**
@@ -36,13 +35,13 @@ public abstract class GeneralPlayerRenderer extends EntityRenderer<AbstractClien
 		@Override
 		public final void render(AbstractClientPlayer entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 			if (this.shouldShowName(entity)) {
-				super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);// 此处渲染玩家时，shouldShowName()必定会为true
+				super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);// 此处渲染玩家时，shouldShowName()必定会为true，除非Team设置名称不可见
 			} else {
 				Minecraft mc = Minecraft.getInstance();
-				Entity original = mc.cameraEntity;
-				mc.cameraEntity = entity;// 此为兼容Geckolib、YSM的shouldShowName()判断，当cameraEntity与渲染的实体相同时，不会渲染名字，但实体模型本身还会渲染
-				super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
-				mc.cameraEntity = original;
+				boolean original = mc.options.hideGui;
+				mc.options.hideGui = true;// 此为兼容Geckolib、YSM的shouldShowName()判断，当hideGui为true时，不会渲染名字，但实体模型本身还会渲染
+				super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);// 注意：YSM渲染会出现头发乱摆动问题
+				mc.options.hideGui = original;
 			}
 		}
 	}

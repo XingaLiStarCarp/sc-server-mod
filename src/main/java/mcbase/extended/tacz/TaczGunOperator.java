@@ -9,13 +9,14 @@ import com.tacz.guns.entity.shooter.LivingEntityAmmoCheck;
 
 import jvmsp.reflection;
 import jvmsp.unsafe;
+import mcbase.extended.gun.GunOperator;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import scba.ModEntry;
 
-public class TaczGunOperator {
+public class TaczGunOperator implements GunOperator {
 	/**
 	 * 通过Unsafe修改LivingEntityMixin的tacz$ammoCheck字段实现自定义
 	 */
@@ -44,7 +45,7 @@ public class TaczGunOperator {
 		 * 
 		 * @param needCheckAmmo
 		 */
-		public void setReloadingNeedCheckAmmo(boolean needCheckAmmo) {
+		public void setReloadNeedCheckAmmo(boolean needCheckAmmo) {
 			this.needCheckAmmo = needCheckAmmo;
 		}
 
@@ -53,7 +54,7 @@ public class TaczGunOperator {
 		 * 
 		 * @param consumesAmmoOrNot
 		 */
-		public void setShootConsumesAmmoOrNot(boolean consumesAmmoOrNot) {
+		public void setShootConsumesAmmo(boolean consumesAmmoOrNot) {
 			this.consumesAmmoOrNot = consumesAmmoOrNot;
 		}
 
@@ -73,11 +74,11 @@ public class TaczGunOperator {
 	protected final IGunOperator gunOperator;
 	private final CustomLivingEntityAmmoCheck tacz$ammoCheck;
 
-	InteractionHand hand;
+	protected InteractionHand hand;
 
-	public TaczGunOperator(LivingEntity shooter, InteractionHand hand) {
-		this.entity = shooter;
-		this.gunOperator = IGunOperator.fromLivingEntity(shooter);
+	public TaczGunOperator(LivingEntity entity, InteractionHand hand) {
+		this.entity = entity;
+		this.gunOperator = IGunOperator.fromLivingEntity(entity);
 		this.hand = hand;
 		this.tacz$ammoCheck = new CustomLivingEntityAmmoCheck(true, true);
 		CustomLivingEntityAmmoCheck.setLivingEntityAmmoCheck(gunOperator, tacz$ammoCheck);
@@ -87,18 +88,22 @@ public class TaczGunOperator {
 		this(shooter, InteractionHand.MAIN_HAND);
 	}
 
-	/**
-	 * 瞄准动作
-	 * 
-	 * @param isAim
-	 */
+	@Override
+	public InteractionHand getGunHand() {
+		return this.hand;
+	}
+
+	@Override
+	public LivingEntity getGunHolder() {
+		return this.entity;
+	}
+
+	@Override
 	public final void aim(boolean isAim) {
 		this.gunOperator.aim(isAim);
 	}
 
-	/**
-	 * 使用枪械近战攻击
-	 */
+	@Override
 	public final void melee() {
 		this.gunOperator.melee();
 	}
@@ -107,14 +112,17 @@ public class TaczGunOperator {
 		gunOperator.draw(() -> this.getGunItem());
 	}
 
+	@Override
 	public final void bolt() {
 		gunOperator.bolt();
 	}
 
+	@Override
 	public final void reload() {
 		gunOperator.reload();
 	}
 
+	@Override
 	public final int getGunAmmo() {
 		return TaczGuns.getGunAmmo(this.getGunItem());
 	}
@@ -128,10 +136,6 @@ public class TaczGunOperator {
 		return IGun.getIGunOrNull(getGunItem());
 	}
 
-	public final ItemStack getGunItem() {
-		return entity.getItemInHand(hand);
-	}
-
 	/**
 	 * 向指定坐标射击
 	 * 
@@ -139,6 +143,8 @@ public class TaczGunOperator {
 	 * @param target
 	 * @return
 	 */
+	@Override
+	@SuppressWarnings("unchecked")
 	public final ShootResult shoot(Vec3 target) {
 		if (this.getGun() == null) {
 			return ShootResult.NOT_GUN;
@@ -157,12 +163,10 @@ public class TaczGunOperator {
 		}
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
 	public final ShootResult shootAuto(Vec3 target) {
-		this.bolt();// 先拉栓子弹上膛
-		ShootResult result = shoot(target);// 射击
-		if (getGunAmmo() == 0) {
-			this.reload();// 本次射击完成后，如果没有子弹则上弹
-		}
+		ShootResult result = GunOperator.super.shootAuto(target);
 		switch (result) {
 		case ShootResult.NOT_DRAW:
 			this.draw();
@@ -179,15 +183,22 @@ public class TaczGunOperator {
 		return result;
 	}
 
-	public void setReloadingNeedCheckAmmo(boolean needCheckAmmo) {
-		this.tacz$ammoCheck.setReloadingNeedCheckAmmo(needCheckAmmo);
+	@Override
+	public void setReloadNeedCheckAmmo(boolean needCheckAmmo) {
+		this.tacz$ammoCheck.setReloadNeedCheckAmmo(needCheckAmmo);
 	}
 
-	public void setShootConsumesAmmoOrNot(boolean consumesAmmoOrNot) {
-		this.tacz$ammoCheck.setShootConsumesAmmoOrNot(consumesAmmoOrNot);
+	@Override
+	public void setShootConsumesAmmo(boolean consumesAmmoOrNot) {
+		this.tacz$ammoCheck.setShootConsumesAmmo(consumesAmmoOrNot);
 	}
 
 	public void crawl(boolean isCrawl) {
 		gunOperator.crawl(isCrawl);
+	}
+
+	@Override
+	public boolean isGun(ItemStack item) {
+		return TaczGuns.isGun(item);
 	}
 }

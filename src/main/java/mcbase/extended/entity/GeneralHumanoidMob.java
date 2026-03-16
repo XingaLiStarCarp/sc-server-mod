@@ -11,9 +11,11 @@ import mcbase.entity.data.SynchedEntityDataOp;
 import mcbase.entity.mob.BaseMob;
 import mcbase.entity.mob.HumanoidMob;
 import mcbase.entity.mob.ProxyRenderPlayer.ProxyRenderPlayerEntity;
+import mcbase.entity.mob.ProxyRenderPlayer.ProxyRenderPlayerProvider;
 import mcbase.extended.tlm.entity.maid.MaidMob;
 import mcbase.extended.tlm.entity.maid.ProxyRenderMaid.MaidModelAsset;
 import mcbase.extended.tlm.entity.maid.ProxyRenderMaid.ProxyRenderMaidEntity;
+import mcbase.extended.tlm.entity.maid.ProxyRenderMaid.ProxyRenderMaidProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -30,7 +32,7 @@ import net.minecraftforge.registries.RegistryObject;
 /**
  * 通用人型实体，支持TLM、YSM和玩家模型
  */
-public class GeneralHumanoidMob extends BaseMob {
+public class GeneralHumanoidMob extends BaseMob implements ProxyRenderPlayerProvider, ProxyRenderMaidProvider {
 
 	public static class GeneralHumanoidModelInfo {
 		/**
@@ -181,6 +183,7 @@ public class GeneralHumanoidMob extends BaseMob {
 	 * 
 	 * @return
 	 */
+	@Override
 	public final ProxyRenderPlayerEntity proxyRenderPlayer() {
 		return proxyPlayer == null ? (this.proxyPlayer = this.new ProxyPlayer()) : proxyPlayer;
 	}
@@ -191,6 +194,7 @@ public class GeneralHumanoidMob extends BaseMob {
 	@Deprecated
 	private ProxyMaid proxyMaid;
 
+	@Override
 	public final ProxyRenderMaidEntity proxyRenderMaid() {
 		return proxyMaid == null ? (this.proxyMaid = this.new ProxyMaid()) : proxyMaid;
 	}

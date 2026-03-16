@@ -8,8 +8,8 @@ import mcbase.component.trait.entity.ItemHoldTrait;
 import mcbase.component.trait.entity.RandomWanderingTrait;
 import mcbase.entity.goal.navigation.KeepDistanceToTargetGoal;
 import mcbase.entity.goal.target.NearestTargetGoal;
-import mcbase.extended.tacz.TaczGuns;
-import mcbase.extended.tacz.goal.GunAttackGoal;
+import mcbase.extended.gun.GunOperator;
+import mcbase.extended.gun.goal.GunAttackGoal;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -27,9 +27,9 @@ public class SniperTrait extends MultiTrait {
 			.add(Attributes.ATTACK_SPEED, 1)
 			.build();
 
-	public SniperTrait(String taczGun) {
+	public SniperTrait(String gun, boolean isTacz) {
 		super();
-		this.add(new ItemHoldTrait(TaczGuns.getGun(taczGun))); // 手持物品
+		this.add(new ItemHoldTrait(GunOperator.newGun(gun, isTacz))); // 手持物品
 		this.add(new RandomWanderingTrait());
 		this.add(new GoalTrait()
 				.add(0, (mob) -> new GunAttackGoal(mob, 50).setBoundDistances(2.5, 64))

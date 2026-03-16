@@ -105,7 +105,11 @@ public class Registers {
 	}
 
 	public static final Item item(String type) {
-		return ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(type));
+		return item(ResourceLocation.parse(type));
+	}
+
+	public static final Item item(ResourceLocation type) {
+		return ForgeRegistries.ITEMS.getValue(type);
 	}
 
 	public static final ItemStack itemStack(String type) {

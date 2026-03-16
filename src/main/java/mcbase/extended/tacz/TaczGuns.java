@@ -6,6 +6,7 @@ import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.api.item.gun.FireMode;
 import com.tacz.guns.api.item.nbt.GunItemDataAccessor;
+import com.tacz.guns.item.ModernKineticGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 
@@ -74,5 +75,9 @@ public class TaczGuns {
 	 */
 	public static final int getGunAmmo(ItemStack gunItem) {
 		return ((GunItemDataAccessor) gunItem.getItem()).getCurrentAmmoCount(gunItem);
+	}
+
+	public static final boolean isGun(ItemStack item) {
+		return item.getItem() instanceof ModernKineticGunItem;
 	}
 }

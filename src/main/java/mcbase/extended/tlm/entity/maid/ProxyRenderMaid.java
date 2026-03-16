@@ -53,6 +53,10 @@ public interface ProxyRenderMaid extends ProxyRenderEntity<EntityMaid, MaidModel
 	public static final float MIAD_WIDTH = 0.6f;
 	public static final float MAID_HEIGHT = 1.8f;
 
+	public static interface ProxyRenderMaidProvider {
+		public abstract ProxyRenderMaid proxyRenderMaid();
+	}
+
 	/**
 	 * 女仆模型信息。<br>
 	 * 包含TLM的模型信息和YSM的模型信息。<br>
@@ -524,7 +528,11 @@ public interface ProxyRenderMaid extends ProxyRenderEntity<EntityMaid, MaidModel
 	 * 继承自Entity的类需要实现的接口
 	 */
 	@SuppressWarnings("unchecked")
-	public static interface ProxyRenderMaidEntity extends ProxyRenderMaid {
+	public static interface ProxyRenderMaidEntity extends ProxyRenderMaid, ProxyRenderMaidProvider {
+		@Override
+		public default ProxyRenderMaid proxyRenderMaid() {
+			return this;
+		}
 
 		public static final String TAG_TLM_MODEL_ID = "tlm_model_id";
 		public static final String TAG_IS_YSM_MODEL = "is_ysm_model";
@@ -668,5 +676,18 @@ public interface ProxyRenderMaid extends ProxyRenderEntity<EntityMaid, MaidModel
 		public default void stopRouletteAnim() {
 			entityData().set(maidEntityDataAccs()[IDX_YSM_ANIMATION_PLAYING], false);
 		}
+	}
+
+	/**
+	 * 播放动画。<br>
+	 * 目前可播放动画见MaidAnimationMessage
+	 * 
+	 * @param animationId
+	 */
+	public default void playAnimation(int animationId) {
+		EntityMaid renderingEntity = renderingEntity();
+		renderingEntity.animationId = animationId;
+		renderingEntity.animationRecordTime = System.currentTimeMillis();
+		renderingEntity.shouldReset = true;
 	}
 }

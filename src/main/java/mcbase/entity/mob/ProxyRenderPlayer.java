@@ -28,10 +28,19 @@ public interface ProxyRenderPlayer extends ProxyRenderEntity<Player, PlayerModel
 		return renderingEntity;
 	}
 
-	public interface ProxyRenderPlayerEntity extends ProxyRenderPlayer, HumanoidEntity {
+	public interface ProxyRenderPlayerEntity extends ProxyRenderPlayer, HumanoidEntity, ProxyRenderPlayerProvider {
 		@Override
-		default SynchedEntityData entityData() {
+		public default SynchedEntityData entityData() {
 			return ProxyRenderPlayer.super.entityData();
 		}
+
+		@Override
+		public default ProxyRenderPlayer proxyRenderPlayer() {
+			return this;
+		}
+	}
+
+	public static interface ProxyRenderPlayerProvider {
+		public abstract ProxyRenderPlayer proxyRenderPlayer();
 	}
 }

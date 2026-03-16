@@ -1,16 +1,16 @@
-package mcbase.extended.tacz.goal;
+package mcbase.extended.gun.goal;
 
 import mcbase.entity.goal.action.AttackGoal;
-import mcbase.extended.tacz.TaczGunOperator;
+import mcbase.extended.gun.GunOperator.GeneralGunOperator;
 import net.minecraft.world.entity.Mob;
 
 public class GunAttackGoal extends AttackGoal {
-	protected TaczGunOperator gunOperator;
+	protected GeneralGunOperator gunOperator;
 
 	public GunAttackGoal(Mob mob, int attackInterval) {
 		super(mob, attackInterval);
-		gunOperator = new TaczGunOperator(mob);
-		gunOperator.setReloadingNeedCheckAmmo(false);// AI射击不需要检查是否有弹夹就可以直接换弹
+		gunOperator = new GeneralGunOperator(mob);
+		gunOperator.setReloadNeedCheckAmmo(false);// AI射击不需要检查是否有弹夹就可以直接换弹
 		this.setBoundDistances(4, 32);
 	}
 
@@ -28,7 +28,7 @@ public class GunAttackGoal extends AttackGoal {
 			break;
 		case 1:
 			gunOperator.aim(true);
-			gunOperator.shootAuto(this.mob.getTarget().position());
+			gunOperator.shootAuto(this.mob.getTarget());
 			break;
 		}
 	}
